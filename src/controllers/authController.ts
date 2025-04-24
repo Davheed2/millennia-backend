@@ -18,6 +18,8 @@ import {
 	setCookie,
 	toJSON,
 	verifyToken,
+	sendSignUpEmail,
+	sendWelcomeEmail,
 } from '@/common/utils';
 import { catchAsync } from '@/middlewares';
 import { ENVIRONMENT } from '@/common/config';
@@ -61,7 +63,7 @@ class AuthController {
 
 		const verificationUrl = `${getDomainReferer(req)}/auth?verify=${hashedVerificationToken}`;
 		//console.log(verificationUrl);
-		//await sendSignUpEmail(email, firstName, verificationUrl);
+		await sendSignUpEmail(email, firstName, verificationUrl);
 
 		const ip = req.ip || req.socket.remoteAddress || '';
 		const geo = geoip.lookup(ip);
@@ -130,7 +132,7 @@ class AuthController {
 			isEmailVerified: true,
 		});
 
-		//await sendWelcomeEmail(extinguishUser.email, extinguishUser.firstName);
+		await sendWelcomeEmail(extinguishUser.email, extinguishUser.firstName);
 		return AppResponse(res, 200, toJSON(updatedUser), 'Email verified successfully');
 	});
 
@@ -178,7 +180,8 @@ class AuthController {
 		});
 
 		//login email
-		//await sendLoginEmail(user.email, user.firstName, '5757');
+		const loginTime = DateTime.now().toFormat("cccc, LLLL d, yyyy 'at' t");
+		await sendLoginEmail(user.email, user.firstName, loginTime);
 		return AppResponse(res, 200, toJSON([user]), 'User logged in successfully');
 	});
 
