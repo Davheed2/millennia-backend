@@ -29,11 +29,11 @@ export const sendEmail = async (job: EmailJobData) => {
 	switch (type) {
 		case 'signUpEmail':
 			htmlContent = signUpEmail(data as SignUpEmailData);
-			subject = 'Verify your email to get started with Expert Layer';
+			subject = 'Verify your email to get started with Millennia Trades';
 			break;
 		case 'welcomeEmail':
 			htmlContent = welcomeEmail(data as WelcomeEmailData);
-			subject = 'Welcome to Expert Layer';
+			subject = 'Welcome to Millennia Trades';
 			break;
 		case 'loginEmail':
 			htmlContent = loginEmail(data as LoginEmailData);
