@@ -1,57 +1,57 @@
 import { baseTemplate } from './baseTemplate';
 
 export const welcomeEmail = (data: { name: string }) => {
-	return baseTemplate(
-		`<h2>Hi ${data.name},</h2>
+  return baseTemplate(
+    `<h2>Hi ${data.name},</h2>
 
-        <p>
-            Welcome to <strong>Expert Layer</strong> — where talents, clients, and project managers come together to deliver exceptional results.
-        </p>
+    <p>
+      Welcome to <strong>Millennia Trades</strong> — your modern investing platform built for everyone.
+    </p>
 
-        <p>
-            Whether you're here to offer your skills, manage high-impact projects, or bring your ideas to life, you've just joined a powerful network built for efficient, high-quality gig delivery.
-        </p>
+    <p>
+      You’re now part of a growing community that’s using smart, data-driven strategies to grow their wealth with confidence.
+    </p>
 
-        <p>
-            <strong>What makes Expert Layer different?</strong><br/>
-            👉 A streamlined ecosystem where collaboration, speed, and clarity drive outcomes.
-        </p>
+    <p>
+      <strong>Why Millennia Trades?</strong><br/>
+      📈 Personalized strategies, low fees, and intuitive tools that work for beginners and experts alike.
+    </p>
 
-        <h3>🚀 Here’s what you can expect:</h3>
-        <ul>
-            <li>Connect with <strong>verified talents and trusted clients</strong></li>
-            <li>Access <strong>project tools</strong> that keep timelines tight and deliverables clear</li>
-            <li>Get <strong>support from dedicated project managers</strong> to help keep things on track</li>
-        </ul>
+    <h3>💼 Here’s what you can look forward to:</h3>
+    <ul>
+      <li>Build a diversified portfolio with <strong>stocks, bonds, and ETFs</strong></li>
+      <li>Track your performance with <strong>real-time insights and growth analytics</strong></li>
+      <li>Enjoy <strong>secure, guided investing</strong> tailored to your goals</li>
+    </ul>
 
-        <p>
-            Whether you're starting your first gig or scaling your operations, Expert Layer gives you everything you need to thrive in a fast-moving world of work.
-        </p>
+    <p>
+      Whether you’re saving for your future or investing for financial freedom, we’re here to help you take the next step with confidence.
+    </p>
 
-        <p>
-            Collaboration, accountability, and excellence — it's all here, and it starts now.
-        </p>
+    <p>
+      Simple. Smart. Secure. That’s investing the Millennia way.
+    </p>
 
-        <hr style="margin: 24px 0;" />
+    <hr style="margin: 24px 0;" />
 
-        <h3>🔐 We take your privacy seriously:</h3>
-        <ul>
-            <li>All communication and files are secured within the platform</li>
-            <li>Your data is protected by enterprise-grade security protocols</li>
-            <li>We never share your information without your consent</li>
-        </ul>
+    <h3>🔒 Your security matters:</h3>
+    <ul>
+      <li>We use bank-grade encryption to keep your data safe</li>
+      <li>Two-factor authentication available for extra protection</li>
+      <li>Your info stays private — always</li>
+    </ul>
 
-        <p>Need more info?</p>
-        <p>
-            <a href="https://app.100-minds.com/privacy-policy" style="color: #bd531e; font-weight: bold;">Read our full privacy policy →</a>
-        </p>
+    <p>Want to learn more?</p>
+    <p>
+      <a href="https://www.millenniatrades.com/privacy" style="color: #1D4ED8; font-weight: bold;">Check out our privacy policy →</a>
+    </p>
 
-        <hr style="margin: 24px 0;" />
+    <hr style="margin: 24px 0;" />
 
-        <p>
-            We’re thrilled to have you with us.<br />
-            <strong>Let’s build something incredible.</strong><br />
-            The Expert Layer Team
-        </p>`
-	);
+    <p>
+      We’re excited to help you reach your investing goals.<br />
+      <strong>Let’s build your future, together.</strong><br />
+      – The Millennia Trades Team
+    </p>`
+  );
 };

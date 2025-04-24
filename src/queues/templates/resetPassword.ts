@@ -3,36 +3,39 @@ import { baseTemplate } from './baseTemplate';
 export const resetPasswordEmail = (data: { name: string }) => {
 	return baseTemplate(
 		`<h2>Hello, ${data.name}!</h2>
-        <p>
-            Your password has been successfully reset. You can now log in with your new password.
-        </p>
+    <p>
+      Your password has been successfully reset. You can now log in with your new credentials and continue investing with confidence.
+    </p>
 
-        <table class="body-action" align="center" width="100%" cellpadding="0" cellspacing="0">
+    <table class="body-action" align="center" width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td align="center">
+          <table width="100%" border="0" cellspacing="0" cellpadding="0">
             <tr>
               <td align="center">
-                <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                 <tr>
-                    <td align="center">
-                    <table border="0" cellspacing="0" cellpadding="0">
-                        <tr>
-                            <td>
-                                <a href="https://100minds.com/login" class="button" style="background-color: rgb(112, 232, 224); border-radius: 20px; color: #163300; display: inline-block; text-decoration: none; padding: 12px 30px; font-size: 16px;">
-                                    Log In
-                                </a>
-                            </td>
-                        </tr>
-                    </table>
+                <table border="0" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td>
+                      <a href="https://www.millenniatrades.com/signin" class="button" style="background-color: #1D4ED8; border-radius: 20px; color: #ffffff; display: inline-block; text-decoration: none; padding: 12px 30px; font-size: 16px;">
+                        Sign In
+                      </a>
                     </td>
-                 </tr>
+                  </tr>
                 </table>
               </td>
             </tr>
-        </table>
+          </table>
+        </td>
+      </tr>
+    </table>
 
-        <p>
-            If you did not reset your password, please <a href="https://100minds.com/support" style="color:rgb(112, 232, 204); text-decoration: none;">contact our support team</a> immediately.
-        </p>
+    <p>
+      Didn’t request a password reset? Please <a href="https://www.millenniatrades.com/contact" style="color:#1D4ED8; text-decoration: none;">contact our support team</a> right away to secure your account.
+    </p>
 
-        <p>Thanks,<br />The 100minds Team</p>`
+    <p>
+      Thanks,<br />
+      The Millennia Trades Team
+    </p>`
 	);
 };

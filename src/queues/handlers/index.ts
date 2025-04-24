@@ -53,7 +53,7 @@ export const sendEmail = async (job: EmailJobData) => {
 	}
 
 	const mailOptions = {
-		from: `"MILLENNIA" <${ENVIRONMENT.EMAIL.GMAIL_USER}>`,
+		from: `"Millennia Trades" <${ENVIRONMENT.EMAIL.GMAIL_USER}>`,
 		to: data.to,
 		subject: subject,
 		html: htmlContent,

@@ -143,12 +143,12 @@ export const baseTemplate = (template: string): string => {
                     <tr>
                       <td class="content-cell-footer">
                         <p>
-                          This email was sent to you by 100minds. By using our services, you agree to our
+                          This email was sent to you by Millennia Trades. By using our services, you agree to our
                         </p>
                         <p>
                           <a href="https://helpcenter.com">customer agreements</a>.
                         </p>
-                        <p>&copy; 100minds ${new Date().getFullYear()}. All rights reserved.</p>
+                        <p>&copy; Millennia Trades ${new Date().getFullYear()}. All rights reserved.</p>
                       </td>
                     </tr>
                   </table>
