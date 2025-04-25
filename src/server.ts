@@ -15,7 +15,7 @@ import '@/common/interfaces/request';
 import { AppError, logger, stream } from '@/common/utils';
 import { errorHandler } from '@/controllers';
 import { timeoutMiddleware, validateDataWithZod } from '@/middlewares';
-import { userRouter, authRouter } from '@/routes';
+import { userRouter, authRouter, referralRouter } from '@/routes';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -68,11 +68,7 @@ app.use(limiter);
 //Middleware to allow CORS from frontend
 app.use(
 	cors({
-		origin: [
-			'http://localhost:5173',
-			'http://localhost:3000',
-			'http://localhost:3001',
-		],
+		origin: ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:3001'],
 		credentials: true,
 	})
 );
@@ -155,6 +151,7 @@ app.use('/api/v1/alive', (req: Request, res: Response) => {
 
 app.use('/api/v1/user', userRouter);
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/referral', referralRouter);
 
 app.all('/{*splat}', async (req, res) => {
 	logger.error('route not found ' + new Date(Date.now()) + ' ' + req.originalUrl);

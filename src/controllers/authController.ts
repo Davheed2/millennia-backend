@@ -94,6 +94,7 @@ class AuthController {
 				referreeId: user.id,
 				referreeFirstName: firstName,
 				referreeLastName: lastName,
+				referreeEmail: email,
 				hasInvested: false,
 			});
 		}

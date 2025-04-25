@@ -3,7 +3,7 @@ import { BonusType } from '@/common/constants';
 import { userRepository, referralRepository, bonusTransactionRepository } from '@/repository';
 class ReferralService {
 	// Track a new referral when someone signs up with a referral code
-	async trackReferral(referrerCode: string, newUserId: string, firstName: string, lastName: string) {
+	async trackReferral(referrerCode: string, newUserId: string, firstName: string, lastName: string, email: string) {
 		// Find the referrer by their code
 		const referrer = await userRepository.findByReferralCode(referrerCode);
 
@@ -17,6 +17,7 @@ class ReferralService {
 			referreeId: newUserId,
 			referreeFirstName: firstName,
 			referreeLastName: lastName,
+			referreeEmail: email,
 			hasInvested: false,
 		});
 

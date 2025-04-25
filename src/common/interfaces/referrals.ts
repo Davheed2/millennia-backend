@@ -4,6 +4,7 @@ export interface IReferral {
 	referreeId: string;
 	referreeFirstName: string;
 	referreeLastName: string;
+	referreeEmail: string;
 	hasInvested: boolean;
 	created_at?: Date;
 	updated_at?: Date;
