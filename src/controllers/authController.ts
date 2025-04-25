@@ -244,6 +244,49 @@ class AuthController {
 	});
 
 	resetPassword = catchAsync(async (req: Request, res: Response) => {
+		const { token, password, confirmPassword } = req.body;
+
+		if (!token || !password || !confirmPassword) {
+			throw new AppError('All fields are required', 403);
+		}
+		if (password !== confirmPassword) {
+			throw new AppError('Passwords do not match', 403);
+		}
+
+		const decodedToken = await verifyToken(token);
+		if (!decodedToken.token) {
+			throw new AppError('Invalid token', 401);
+		}
+
+		const user = await userRepository.findByPasswordResetToken(decodedToken.token);
+		if (!user) {
+			throw new AppError('Password reset token is invalid or has expired', 400);
+		}
+
+		const isSamePassword = await comparePassword(password, user.password);
+		if (isSamePassword) {
+			throw new AppError('New password cannot be the same as the old password', 400);
+		}
+
+		const hashedPassword = await hashPassword(password);
+
+		const updatedUser = await userRepository.update(user.id, {
+			password: hashedPassword,
+			passwordResetRetries: 0,
+			passwordChangedAt: DateTime.now().toJSDate(),
+			passwordResetToken: '',
+			passwordResetExpires: DateTime.now().toJSDate(),
+		});
+		if (!updatedUser) {
+			throw new AppError('Password reset failed', 400);
+		}
+
+		await sendResetPasswordEmail(user.email, user.firstName);
+
+		return AppResponse(res, 200, null, 'Password reset successfully');
+	});
+
+	changePassword = catchAsync(async (req: Request, res: Response) => {
 		const { password, confirmPassword } = req.body;
 		const { user } = req;
 
