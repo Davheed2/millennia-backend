@@ -165,7 +165,7 @@ export class UserController {
 
 	adminDeleteAccount = catchAsync(async (req: Request, res: Response) => {
 		const { user } = req;
-		const { makeAdmin, userId } = req.body;
+		const { userId } = req.body;
 
 		if (!user) {
 			throw new AppError('Please log in again', 401);

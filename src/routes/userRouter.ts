@@ -13,5 +13,6 @@ router.post('/update-user', userController.updateProfile);
 router.post('/upload-profile-picture', multerUpload.single('photo'), userController.uploadProfilePicture);
 router.post('/suspend-user', userController.suspendUser);
 router.post('/make-admin', userController.makeAdmin);
+router.get('/delete-account', userController.deleteAccount);
 
 export { router as userRouter };
