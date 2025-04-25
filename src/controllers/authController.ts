@@ -167,6 +167,9 @@ class AuthController {
 		if (user.isSuspended) {
 			throw new AppError('Your account is currently suspended', 401);
 		}
+		if (user.isDeleted) {
+			throw new AppError('Your account is currently deleted', 401);
+		}
 
 		const accessToken = generateAccessToken(user.id);
 		const refreshToken = generateRefreshToken(user.id);
