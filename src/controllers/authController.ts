@@ -243,33 +243,32 @@ class AuthController {
 	});
 
 	resetPassword = catchAsync(async (req: Request, res: Response) => {
-		const { token, password, confirmPassword } = req.body;
+		const { password, confirmPassword } = req.body;
+		const { user } = req;
 
-		if (!token || !password || !confirmPassword) {
+		if (!password || !confirmPassword) {
 			throw new AppError('All fields are required', 403);
 		}
 		if (password !== confirmPassword) {
 			throw new AppError('Passwords do not match', 403);
 		}
-
-		const decodedToken = await verifyToken(token);
-		if (!decodedToken.token) {
-			throw new AppError('Invalid token', 401);
-		}
-
-		const user = await userRepository.findByPasswordResetToken(decodedToken.token);
 		if (!user) {
-			throw new AppError('Password reset token is invalid or has expired', 400);
+			throw new AppError('You are not logged in', 401);
 		}
 
-		const isSamePassword = await comparePassword(password, user.password);
+		const extinguishUser = await userRepository.findById(user.id);
+		if (!extinguishUser) {
+			throw new AppError('User not found', 400);
+		}
+
+		const isSamePassword = await comparePassword(password, extinguishUser.password);
 		if (isSamePassword) {
 			throw new AppError('New password cannot be the same as the old password', 400);
 		}
 
 		const hashedPassword = await hashPassword(password);
 
-		const updatedUser = await userRepository.update(user.id, {
+		const updatedUser = await userRepository.update(extinguishUser.id, {
 			password: hashedPassword,
 			passwordResetRetries: 0,
 			passwordChangedAt: DateTime.now().toJSDate(),
@@ -280,7 +279,7 @@ class AuthController {
 			throw new AppError('Password reset failed', 400);
 		}
 
-		await sendResetPasswordEmail(user.email, user.firstName);
+		await sendResetPasswordEmail(extinguishUser.email, extinguishUser.firstName);
 
 		return AppResponse(res, 200, null, 'Password reset successfully');
 	});
