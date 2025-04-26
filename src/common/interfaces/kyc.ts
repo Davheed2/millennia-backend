@@ -10,6 +10,7 @@ export interface IKyc {
 	documentType: string;
 	document: string;
 	selfie: string;
+	proofOfAddress: string;
 	status: string;
 	created_at?: Date;
 	updated_at?: Date;

@@ -59,6 +59,12 @@ export class KycController {
 			mimetype: files.selfie[0].mimetype,
 		});
 
+		const { secureUrl: proofOfAddress } = await uploadKycDocumentFile({
+			fileName: `kyc-address/${Date.now()}-${files.proofOfAddress[0].originalname}`,
+			buffer: files.proofOfAddress[0].buffer,
+			mimetype: files.proofOfAddress[0].mimetype,
+		});
+
 		const [kyc] = await kycRepository.create({
 			name,
 			dob,
@@ -69,6 +75,7 @@ export class KycController {
 			documentType,
 			document: KycDocument,
 			selfie: KycSelfie,
+			proofOfAddress,
 			userId: user.id,
 		});
 		if (!kyc) {
@@ -121,12 +128,12 @@ export class KycController {
 		if (user.role !== 'admin') {
 			throw new AppError('You are not authorized to update a users kyc', 400);
 		}
-        if (!userId) {
-            throw new AppError('User ID is required', 404);
-        }
-        if (!status) {
-            throw new AppError('Status is required', 404);
-        }
+		if (!userId) {
+			throw new AppError('User ID is required', 404);
+		}
+		if (!status) {
+			throw new AppError('Status is required', 404);
+		}
 
 		const findUser = await userRepository.findById(userId);
 		if (!findUser) {

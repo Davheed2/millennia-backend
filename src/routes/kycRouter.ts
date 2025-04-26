@@ -8,10 +8,11 @@ const router = express.Router();
 router.use(protect);
 
 router.post(
-	'/create',
+	'/create', 
 	multerUpload.fields([
 		{ name: 'document', maxCount: 1 },
 		{ name: 'selfie', maxCount: 1 },
+        { name: 'proofOfAddress', maxCount: 1 },
 	]),
 	kycController.create
 );
