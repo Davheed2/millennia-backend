@@ -25,6 +25,7 @@ export interface IUser {
 	isSuspended: boolean;
 	referralCode: string;
 	referralCredits?: number;
+	isKycVerified: boolean;
 	isDeleted: boolean;
 	created_at?: Date;
 	updated_at?: Date;

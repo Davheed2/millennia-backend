@@ -153,6 +153,9 @@ export class KycController {
 		const updateKyc = await kycRepository.update(kyc.id, {
 			status,
 		});
+		await userRepository.update(userId, {
+			isKycVerified: true,
+		});
 		if (!updateKyc) {
 			throw new AppError('Failed to update user kyc', 500);
 		}
