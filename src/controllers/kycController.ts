@@ -39,12 +39,17 @@ export class KycController {
 		if (!files?.selfie?.[0]) {
 			throw new AppError('Kyc Selfie is required', 400);
 		}
+		if (!files?.proofOfAddress?.[0]) {
+			throw new AppError('Proof of address is required', 400);
+		}
 
 		const kycExists = await kycRepository.findByUserId(user.id);
-		if (kycExists.status === 'pending') {
-			throw new AppError('Your kyc is still being processed', 400);
-		} else {
-			await kycRepository.delete(kycExists.id);
+		if (kycExists) {
+			if (kycExists.status === 'pending') {
+				throw new AppError('Your kyc is still being processed', 400);
+			} else {
+				await kycRepository.delete(kycExists.id);
+			}
 		}
 
 		const { secureUrl: KycDocument } = await uploadKycDocumentFile({
