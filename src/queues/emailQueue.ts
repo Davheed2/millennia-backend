@@ -44,6 +44,16 @@ const addEmailToQueue = async (opts: EmailJobData) => {
 	}
 };
 
+export const resetEmailQueue = async () => {
+	try {
+		console.info('Resetting email queue...');
+		await emailQueue.obliterate({ force: true });
+		console.info('Email queue reset successfully.');
+	} catch (error) {
+		console.error('Failed to reset email queue:', error);
+	}
+};
+
 const workerOptions: WorkerOptions = {
 	connection,
 	limiter: { max: 1, duration: 1000 }, // process 1 email every second due to rate limiting of email sender

@@ -15,3 +15,9 @@ export enum BonusType {
 	REFEREE_BONUS = 'REFEREE_BONUS',
 	MILESTONE_BONUS = 'MILESTONE_BONUS',
 }
+
+export enum KycStatus {
+	PENDING = 'pending',
+	APPROVED = 'approved',
+	REJECTED = 'rejected',
+}

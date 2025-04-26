@@ -27,6 +27,7 @@ import hpp from 'hpp';
 import http from 'http';
 import morgan from 'morgan';
 import { startAllQueuesAndWorkers, stopAllQueuesAndWorkers } from './queues';
+import { kycRouter } from './routes/kycRouter';
 
 dotenv.config();
 /**
@@ -49,7 +50,7 @@ const appName = ENVIRONMENT.APP.NAME;
  */
 app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal']); // Enable trust proxy
 app.use(cookieParser());
-app.use(express.json({ limit: '10kb' }));
+app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 /**
@@ -152,6 +153,7 @@ app.use('/api/v1/alive', (req: Request, res: Response) => {
 app.use('/api/v1/user', userRouter);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/referral', referralRouter);
+app.use('/api/v1/kyc', kycRouter);
 
 app.all('/{*splat}', async (req, res) => {
 	logger.error('route not found ' + new Date(Date.now()) + ' ' + req.originalUrl);
@@ -177,6 +179,7 @@ const appServer = server.listen(port, async () => {
 	(async () => {
 		await startAllQueuesAndWorkers();
 	})();
+	// await resetEmailQueue();
 	console.log(`==> App ${appName ? `: ${appName}` : ''} is running on port ${port}`);
 });
 

@@ -5,11 +5,12 @@ import {
 	ForgotPasswordData,
 	WelcomeEmailData,
 	SignUpEmailData,
+	KycData,
 } from '@/common/interfaces';
 import { logger } from '@/common/utils';
 import nodemailer from 'nodemailer';
 import { ENVIRONMENT } from 'src/common/config';
-import { forgotPasswordEmail, loginEmail, resetPasswordEmail, signUpEmail, welcomeEmail } from '../templates';
+import { forgotPasswordEmail, loginEmail, resetPasswordEmail, signUpEmail, welcomeEmail, KycEmail } from '../templates';
 
 const transporter = nodemailer.createTransport({
 	service: 'gmail',
@@ -47,6 +48,13 @@ export const sendEmail = async (job: EmailJobData) => {
 			htmlContent = resetPasswordEmail(data as ResetPasswordData);
 			subject = 'Reset Password';
 			break;
+		case 'kyc': {
+			const kycData = data as KycData;
+			htmlContent = KycEmail(kycData);
+			subject = kycData.status === 'approved' ? 'KYC Approved' : 'KYC Rejected';
+			break;
+		}
+
 		// Handle other email types...
 		default:
 			throw new Error(`No template found for email type: ${type}`);

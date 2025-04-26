@@ -7,3 +7,4 @@ export * from './aws';
 export * from './emailQueue';
 export * from './referrals';
 export * from './bonusTransaction';
+export * from './kyc';

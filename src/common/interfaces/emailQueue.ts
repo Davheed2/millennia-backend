@@ -26,9 +26,15 @@ export interface ResetPasswordData extends CommonDataFields {
 	name: string;
 }
 
+export interface KycData extends CommonDataFields {
+	name: string;
+	status: 'approved' | 'rejected';
+}
+
 export type EmailJobData =
 	| { type: 'signUpEmail'; data: SignUpEmailData }
 	| { type: 'welcomeEmail'; data: WelcomeEmailData }
 	| { type: 'loginEmail'; data: LoginEmailData }
 	| { type: 'forgotPassword'; data: ForgotPasswordData }
-	| { type: 'resetPassword'; data: ResetPasswordData };
+	| { type: 'resetPassword'; data: ResetPasswordData }
+	| { type: 'kyc'; data: KycData };

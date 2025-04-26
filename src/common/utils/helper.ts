@@ -6,6 +6,7 @@ import { ENVIRONMENT } from '../config';
 import {
 	ForgotPasswordData,
 	IHashData,
+	KycData,
 	LoginEmailData,
 	ResetPasswordData,
 	SignUpEmailData,
@@ -367,6 +368,20 @@ const sendResetPasswordEmail = async (email: string, name: string): Promise<void
 	});
 };
 
+const sendKycEmail = async (email: string, name: string, status: 'approved' | 'rejected'): Promise<void> => {
+	const emailData: KycData = {
+		to: email,
+		priority: 'high',
+		name,
+		status,
+	};
+
+	addEmailToQueue({
+		type: 'kyc',
+		data: emailData,
+	});
+};
+
 export {
 	dateFromString,
 	generateRandom6DigitKey,
@@ -393,4 +408,5 @@ export {
 	sendLoginEmail,
 	sendResetPasswordEmail,
 	sendForgotPasswordEmail,
+	sendKycEmail,
 };
