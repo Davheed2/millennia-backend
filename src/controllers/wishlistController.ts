@@ -11,10 +11,10 @@ export class WishlistController {
 		if (!user) {
 			throw new AppError('Please log in again', 400);
 		}
-		if (!name || !symbol || !brand) throw new AppError('Incomplete wishlist data', 400);
+		if (!name || !symbol || !brand) throw new AppError('Incomplete Watchlist data', 400);
 
 		const isExist = await wishlistRepository.findBySymbolAndUser(symbol, user.id);
-		if (isExist) throw new AppError('Wishlist data exists already', 400);
+		if (isExist) throw new AppError('Watchlist data exists already', 400);
 
 		const [wishlist] = await wishlistRepository.create({
 			name,
@@ -23,10 +23,10 @@ export class WishlistController {
 			userId: user.id,
 		});
 		if (!wishlist) {
-			throw new AppError('Failed to add wishlist', 500);
+			throw new AppError('Failed to add Watchlist', 500);
 		}
 
-		return AppResponse(res, 200, toJSON([wishlist]), 'Wishlist added successfully');
+		return AppResponse(res, 200, toJSON([wishlist]), 'Watchlist added successfully');
 	});
 
 	findAll = catchAsync(async (req: Request, res: Response) => {
@@ -38,10 +38,10 @@ export class WishlistController {
 
 		const wishlist = await wishlistRepository.findByUserId(user.id);
 		if (!wishlist) {
-			throw new AppError('No wishlist found', 404);
+			throw new AppError('No Watchlist found', 404);
 		}
 
-		return AppResponse(res, 200, toJSON(wishlist), 'User wishlist retrieved successfully');
+		return AppResponse(res, 200, toJSON(wishlist), 'User Watchlist retrieved successfully');
 	});
 
 	delete = catchAsync(async (req: Request, res: Response) => {
@@ -55,16 +55,16 @@ export class WishlistController {
 
 		const wishlist = await wishlistRepository.findById(wishlistId);
 		if (!wishlist) {
-			throw new AppError('Wishlist not found', 404);
+			throw new AppError('Watchlist not found', 404);
 		}
-		if (wishlist.isDeleted) throw new AppError('Wishlist has been deleted already', 400);
+		if (wishlist.isDeleted) throw new AppError('Watchlist has been deleted already', 400);
 
 		const removeList = await wishlistRepository.update(wishlistId, { isDeleted: true });
 		if (!removeList) {
-			throw new AppError('Failed to delete wishlist', 400);
+			throw new AppError('Failed to delete Watchlist', 400);
 		}
 
-		return AppResponse(res, 200, null, 'Wishlist removed successfully');
+		return AppResponse(res, 200, null, 'Watchlist removed successfully');
 	});
 }
 
