@@ -15,7 +15,7 @@ import '@/common/interfaces/request';
 import { AppError, logger, stream } from '@/common/utils';
 import { errorHandler } from '@/controllers';
 import { timeoutMiddleware, validateDataWithZod } from '@/middlewares';
-import { userRouter, authRouter, referralRouter } from '@/routes';
+import { userRouter, authRouter, referralRouter, kycRouter } from '@/routes';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -27,7 +27,7 @@ import hpp from 'hpp';
 import http from 'http';
 import morgan from 'morgan';
 import { startAllQueuesAndWorkers, stopAllQueuesAndWorkers } from './queues';
-import { kycRouter } from './routes/kycRouter';
+import { fetchAndUpdateAssets } from './jobs/stockSync';
 
 dotenv.config();
 /**
@@ -146,6 +146,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
  * Initialize routes
  */
 app.use(validateDataWithZod);
+fetchAndUpdateAssets();
 app.use('/api/v1/alive', (req: Request, res: Response) => {
 	res.status(200).json({ status: 'success', message: 'Server is up and running' });
 });

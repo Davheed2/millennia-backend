@@ -40,4 +40,6 @@ export interface IEnvironment {
 		PORT: number;
 		PASSWORD: string;
 	};
+	FINNHUB_API_KEY: string;
+	TWELVE_DATA_API_KEY: string;
 }

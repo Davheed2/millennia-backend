@@ -42,4 +42,6 @@ export const ENVIRONMENT: IEnvironment = {
 		PASSWORD: process.env.QUEUE_REDIS_PASSWORD!,
 		PORT: parseInt(process.env.QUEUE_REDIS_PORT!),
 	},
+	FINNHUB_API_KEY: process.env.FINNHUB_API_KEY!,
+	TWELVE_DATA_API_KEY: process.env.TWELVE_DATA_API_KEY!
 };
