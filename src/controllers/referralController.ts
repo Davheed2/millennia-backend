@@ -4,16 +4,6 @@ import { catchAsync } from '@/middlewares';
 import { referralRepository } from '@/repository';
 
 export class ReferralController {
-	create = catchAsync(async (req: Request, res: Response) => {
-		const { user } = req;
-
-		if (!user) {
-			throw new AppError('Please log in again', 400);
-		}
-
-		return AppResponse(res, 200, null, 'Profile retrieved successfully');
-	});
-
 	findByReferrerId = catchAsync(async (req: Request, res: Response) => {
 		const { user } = req;
 

@@ -8,3 +8,4 @@ export * from './emailQueue';
 export * from './referrals';
 export * from './bonusTransaction';
 export * from './kyc';
+export * from './wishlist';
