@@ -6,7 +6,7 @@ import {
 	sendProcessingDepositEmail,
 	sendProcessingWithdrawalEmail,
 	toJSON,
-	uploadDocumentFile,
+	uploadPaymentProofFile,
 } from '@/common/utils';
 import { catchAsync } from '@/middlewares';
 import { transactionRepository, walletRepository } from '@/repository';
@@ -37,7 +37,7 @@ export class TransactionController {
 
 		let paymentProof: string | null = null;
 		if (file?.buffer && file?.originalname && file?.mimetype) {
-			const { secureUrl } = await uploadDocumentFile({
+			const { secureUrl } = await uploadPaymentProofFile({
 				fileName: `payment-proof/${Date.now()}-${file.originalname}`,
 				buffer: file.buffer,
 				mimetype: file.mimetype,

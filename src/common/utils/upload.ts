@@ -144,6 +144,48 @@ export const uploadDocumentFile = async (payload: IAwsUploadFile): Promise<{ sec
 	}
 };
 
+export const uploadPaymentProofFile = async (payload: IAwsUploadFile): Promise<{ secureUrl: string }> => {
+	const { fileName, buffer, mimetype } = payload;
+
+	if (!fileName || !buffer || !mimetype) {
+		throw new AppError('File name, buffer, and mimetype are required', 400);
+	}
+
+	const MAX_FILE_SIZE = 50 * 1024 * 1024;
+	if (buffer.length > MAX_FILE_SIZE) {
+		throw new AppError('File size exceeds 50MB limit', 400);
+	}
+
+	const validDocumentTypes = [
+		'application/pdf',
+		'image/png',
+		'image/jpg',
+		'image/jpeg',
+	];
+	if (!validDocumentTypes.includes(mimetype)) {
+		throw new AppError('Invalid document format. Supported formats: pdf, png, jpg, jpeg', 400);
+	}
+
+	const uploadParams = {
+		Bucket: ENVIRONMENT.R2.BUCKET_NAME,
+		Key: fileName,
+		Body: buffer,
+		ContentType: mimetype,
+	};
+
+	try {
+		const command = new PutObjectCommand(uploadParams);
+		await r2.send(command);
+
+		const secureUrl = `${ENVIRONMENT.R2.PUBLIC_URL}/${fileName}`;
+
+		return { secureUrl };
+	} catch (error) {
+		console.log(error);
+		throw new AppError('Error uploading document to R2', 500);
+	}
+};
+
 export const uploadKycDocumentFile = async (payload: IAwsUploadFile): Promise<{ secureUrl: string }> => {
 	const { fileName, buffer, mimetype } = payload;
 
