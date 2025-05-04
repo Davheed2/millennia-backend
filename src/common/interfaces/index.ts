@@ -9,3 +9,5 @@ export * from './referrals';
 export * from './bonusTransaction';
 export * from './kyc';
 export * from './wishlist';
+export * from './transaction';
+export * from './wallet';

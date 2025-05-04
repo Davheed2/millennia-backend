@@ -5,3 +5,7 @@ export * from './resetPassword';
 export * from './signUpEmail';
 export * from './welcomeEmail';
 export * from './KycEmail';
+export * from './processingDepositEmail';
+export * from './successfulDepositEmail';
+export * from './processingWithdrawalEmail';
+export * from './successfulWithdrawal';

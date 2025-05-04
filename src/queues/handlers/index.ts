@@ -6,11 +6,27 @@ import {
 	WelcomeEmailData,
 	SignUpEmailData,
 	KycData,
+	ProcessingDepositData,
+	SuccessfulDepositData,
+	ProcessingWithdrawalData,
+	SuccessfulWithdrawalData,
 } from '@/common/interfaces';
 import { logger } from '@/common/utils';
 import nodemailer from 'nodemailer';
 import { ENVIRONMENT } from 'src/common/config';
-import { forgotPasswordEmail, loginEmail, resetPasswordEmail, signUpEmail, welcomeEmail, KycEmail } from '../templates';
+import {
+	forgotPasswordEmail,
+	loginEmail,
+	resetPasswordEmail,
+	signUpEmail,
+	welcomeEmail,
+	KycEmail,
+	DepositProcessingEmail,
+	DepositSuccessEmail,
+	WithdrawalProcessingEmail,
+	WithdrawalSuccessEmail,
+} from '../templates';
+import { Job } from 'bullmq';
 
 const transporter = nodemailer.createTransport({
 	service: 'gmail',
@@ -21,11 +37,13 @@ const transporter = nodemailer.createTransport({
 	},
 });
 
-export const sendEmail = async (job: EmailJobData) => {
-	const { data, type } = job as EmailJobData;
+export const sendEmail = async (job: Job<EmailJobData>) => {
+	const { type, data } = job.data;
 
 	let htmlContent: string;
 	let subject: string;
+
+	logger.info(`Sending email with type: ${type}`);
 
 	switch (type) {
 		case 'signUpEmail':
@@ -54,6 +72,22 @@ export const sendEmail = async (job: EmailJobData) => {
 			subject = kycData.status === 'approved' ? 'KYC Approved' : 'KYC Rejected';
 			break;
 		}
+		case 'processingDeposit':
+			htmlContent = DepositProcessingEmail(data as ProcessingDepositData);
+			subject = 'Your deposit is being processed';
+			break;
+		case 'successfulDeposit':
+			htmlContent = DepositSuccessEmail(data as SuccessfulDepositData);
+			subject = 'Successful Deposit';
+			break;
+		case 'processingWithdrawal':
+			htmlContent = WithdrawalProcessingEmail(data as ProcessingWithdrawalData);
+			subject = 'Your withdrawal request is being processed';
+			break;
+		case 'successfulWithdrawal':
+			htmlContent = WithdrawalSuccessEmail(data as SuccessfulWithdrawalData);
+			subject = 'Successful Withdrawal';
+			break;
 
 		// Handle other email types...
 		default:

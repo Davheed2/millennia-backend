@@ -4,3 +4,5 @@ export * from './referralRouter';
 export * from './kycRouter';
 export * from './assetsRouter';
 export * from './wishlistRouter';
+export * from './transactionRouter';
+export * from './walletRouter';

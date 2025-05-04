@@ -15,7 +15,16 @@ import '@/common/interfaces/request';
 import { AppError, logger, stream } from '@/common/utils';
 import { errorHandler } from '@/controllers';
 import { timeoutMiddleware, validateDataWithZod } from '@/middlewares';
-import { userRouter, authRouter, referralRouter, kycRouter, assetsRouter, wishlistRouter } from '@/routes';
+import {
+	userRouter,
+	authRouter,
+	referralRouter,
+	kycRouter,
+	assetsRouter,
+	wishlistRouter,
+	transactionRouter,
+	walletRouter,
+} from '@/routes';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -157,6 +166,8 @@ app.use('/api/v1/referral', referralRouter);
 app.use('/api/v1/kyc', kycRouter);
 app.use('/api/v1/assets', assetsRouter);
 app.use('/api/v1/wishlist', wishlistRouter);
+app.use('/api/v1/transaction', transactionRouter);
+app.use('/api/v1/wallet', walletRouter);
 
 app.all('/{*splat}', async (req, res) => {
 	logger.error('route not found ' + new Date(Date.now()) + ' ' + req.originalUrl);

@@ -11,6 +11,10 @@ import {
 	ResetPasswordData,
 	SignUpEmailData,
 	WelcomeEmailData,
+	ProcessingDepositData,
+	SuccessfulDepositData,
+	ProcessingWithdrawalData,
+	SuccessfulWithdrawalData,
 } from '../interfaces';
 import type { Response, Request } from 'express';
 import { promisify } from 'util';
@@ -300,6 +304,18 @@ const generateReferralCode = () => {
 	});
 };
 
+const referenceGenerator = () => {
+	const date = new Date();
+	const year = date.getFullYear().toString().slice(-2); // Get last two digits of the year
+	const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Month is 0-indexed
+	const day = date.getDate().toString().padStart(2, '0');
+	const randomNum = Math.floor(Math.random() * 10000)
+		.toString()
+		.padStart(10, '0'); // Random number between 0000 and 9999
+
+	return `TX${year}${month}${day}${randomNum}`;
+};
+
 const sendSignUpEmail = async (email: string, name: string, verificationUrl: string): Promise<void> => {
 	const emailData: SignUpEmailData = {
 		to: email,
@@ -382,6 +398,86 @@ const sendKycEmail = async (email: string, name: string, status: 'approved' | 'r
 	});
 };
 
+const sendProcessingDepositEmail = async (
+	email: string,
+	name: string,
+	amount: number,
+	reference: string
+): Promise<void> => {
+	const emailData: ProcessingDepositData = {
+		to: email,
+		priority: 'high',
+		name,
+		amount,
+		reference,
+	};
+
+	addEmailToQueue({
+		type: 'processingDeposit',
+		data: emailData,
+	});
+};
+
+const sendSuccessfulDepositEmail = async (
+	email: string,
+	name: string,
+	amount: number,
+	reference: string
+): Promise<void> => {
+	const emailData: SuccessfulDepositData = {
+		to: email,
+		priority: 'high',
+		name,
+		amount,
+		reference,
+	};
+
+	addEmailToQueue({
+		type: 'successfulDeposit',
+		data: emailData,
+	});
+};
+
+const sendProcessingWithdrawalEmail = async (
+	email: string,
+	name: string,
+	amount: number,
+	reference: string
+): Promise<void> => {
+	const emailData: ProcessingWithdrawalData = {
+		to: email,
+		priority: 'high',
+		name,
+		amount,
+		reference,
+	};
+
+	addEmailToQueue({
+		type: 'processingWithdrawal',
+		data: emailData,
+	});
+};
+
+const sendSuccessfulWithdrawalEmail = async (
+	email: string,
+	name: string,
+	amount: number,
+	reference: string
+): Promise<void> => {
+	const emailData: SuccessfulWithdrawalData = {
+		to: email,
+		priority: 'high',
+		name,
+		amount,
+		reference,
+	};
+
+	addEmailToQueue({
+		type: 'successfulWithdrawal',
+		data: emailData,
+	});
+};
+
 export {
 	dateFromString,
 	generateRandom6DigitKey,
@@ -397,6 +493,7 @@ export {
 	isValidFileNameAwsUpload,
 	isValidPhotoNameAwsUpload,
 	generateAccessToken,
+	referenceGenerator,
 	generateRefreshToken,
 	getDomainReferer,
 	formatTimeSpent,
@@ -409,4 +506,8 @@ export {
 	sendResetPasswordEmail,
 	sendForgotPasswordEmail,
 	sendKycEmail,
+	sendProcessingDepositEmail,
+	sendSuccessfulDepositEmail,
+	sendProcessingWithdrawalEmail,
+	sendSuccessfulWithdrawalEmail,
 };

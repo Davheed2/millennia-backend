@@ -71,7 +71,14 @@ const workerOptions: WorkerOptions = {
 // create a worker to process jobs from the email queue
 const emailWorker = new Worker<EmailJobData>(
 	'emailQueue',
-	async (job: Job) => await sendEmail(job.data),
+	async (job: Job<EmailJobData>) => {
+		try {
+			await sendEmail(job);
+		} catch (error) {
+			console.error('Error sending email:', error);
+			throw new Error('Failed to send email'); // Throwing error triggers a retry
+		}
+	},
 	workerOptions
 );
 
@@ -107,6 +114,7 @@ const startEmailQueue = async () => {
 	await emailQueue.waitUntilReady();
 	await emailWorker.waitUntilReady();
 	await emailQueueEvent.waitUntilReady();
+	console.info('Email queue and worker are ready.');
 };
 
 const stopEmailQueue = async () => {

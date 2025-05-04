@@ -5,3 +5,5 @@ export * from './referralController';
 export * from './kycController';
 export * from './assetsController';
 export * from './wishlistController';
+export * from './transactionController';
+export * from './walletController';

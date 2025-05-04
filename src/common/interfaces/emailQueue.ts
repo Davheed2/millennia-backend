@@ -31,10 +31,38 @@ export interface KycData extends CommonDataFields {
 	status: 'approved' | 'rejected';
 }
 
+export interface ProcessingDepositData extends CommonDataFields {
+	name: string;
+	amount: number;
+	reference: string;
+}
+
+export interface SuccessfulDepositData extends CommonDataFields {
+	name: string;
+	amount: number;
+	reference: string;
+}
+
+export interface ProcessingWithdrawalData extends CommonDataFields {
+	name: string;
+	amount: number;
+	reference: string;
+}
+
+export interface SuccessfulWithdrawalData extends CommonDataFields {
+	name: string;
+	amount: number;
+	reference: string;
+}
+
 export type EmailJobData =
 	| { type: 'signUpEmail'; data: SignUpEmailData }
 	| { type: 'welcomeEmail'; data: WelcomeEmailData }
 	| { type: 'loginEmail'; data: LoginEmailData }
 	| { type: 'forgotPassword'; data: ForgotPasswordData }
 	| { type: 'resetPassword'; data: ResetPasswordData }
-	| { type: 'kyc'; data: KycData };
+	| { type: 'kyc'; data: KycData }
+	| { type: 'processingDeposit'; data: ProcessingDepositData }
+	| { type: 'successfulDeposit'; data: SuccessfulDepositData }
+	| { type: 'processingWithdrawal'; data: ProcessingWithdrawalData }
+	| { type: 'successfulWithdrawal'; data: SuccessfulWithdrawalData };
