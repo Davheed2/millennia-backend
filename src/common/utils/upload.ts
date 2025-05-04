@@ -161,6 +161,12 @@ export const uploadPaymentProofFile = async (payload: IAwsUploadFile): Promise<{
 		'image/png',
 		'image/jpg',
 		'image/jpeg',
+		'image/webp', // WebP
+		'image/bmp', // BMP
+		'image/tiff', // TIFF
+		'image/svg+xml', // SVG
+		'image/heic', // HEIC (Apple’s format, if supported)
+		'image/svg',
 	];
 	if (!validDocumentTypes.includes(mimetype)) {
 		throw new AppError('Invalid document format. Supported formats: pdf, png, jpg, jpeg', 400);
