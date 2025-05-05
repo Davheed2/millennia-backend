@@ -78,7 +78,7 @@ export class TransactionController {
 		}
 
 		const availableBalance = wallet[0]?.balance + wallet[0]?.portfolioBalance || 0;
-		if (amount > availableBalance) {
+		if (Number(amount) > availableBalance) {
 			throw new AppError('Insufficient Funds', 400);
 		}
 

@@ -78,7 +78,13 @@ app.use(limiter);
 //Middleware to allow CORS from frontend
 app.use(
 	cors({
-		origin: ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:3001'],
+		origin: [
+			'https://millenniatrades.com',
+			'https://www.millenniatrades.com',
+			'http://localhost:5173',
+			'http://localhost:3000',
+			'http://localhost:3001',
+		],
 		credentials: true,
 	})
 );
