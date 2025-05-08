@@ -6,3 +6,4 @@ export * from './assetsRepository';
 export * from './wishlistRepository';
 export * from './transactionRepository';
 export * from './walletRepository';
+export * from './investmentRepository';

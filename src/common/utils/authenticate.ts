@@ -15,7 +15,7 @@ export const authenticate = async ({
 	refreshToken?: string;
 }): Promise<AuthenticateResult> => {
 	if (!refreshToken) {
-		throw new AppError('Unauthorized', 401);
+		throw new AppError('You are not logged in', 401);
 	}
 
 	const handleUserVerification = async (decoded: jwt.JwtPayload): Promise<IUser> => {

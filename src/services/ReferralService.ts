@@ -1,6 +1,6 @@
 // referralService.ts
 import { BonusType } from '@/common/constants';
-import { userRepository, referralRepository, bonusTransactionRepository } from '@/repository';
+import { userRepository, referralRepository, bonusTransactionRepository, walletRepository } from '@/repository';
 class ReferralService {
 	// Track a new referral when someone signs up with a referral code
 	async trackReferral(referrerCode: string, newUserId: string, firstName: string, lastName: string, email: string) {
@@ -68,6 +68,26 @@ class ReferralService {
 			bonusType: BonusType.REFEREE_BONUS,
 			amount,
 			notes: `Bonus for signing up through referral and investing`,
+		});
+
+		let referrerBalance = await walletRepository.findByUserId(referrerId);
+		if (!referrerBalance || referrerBalance.length === 0) {
+			referrerBalance = await walletRepository.create({
+				userId: referrerId,
+			});
+		}
+		await walletRepository.update(referrerBalance[0].id, {
+			portfolioBalance: (referrerBalance[0].portfolioBalance += amount),
+		});
+
+		let referreeBalance = await walletRepository.findByUserId(referreeId);
+		if (!referreeBalance || referreeBalance.length === 0) {
+			referreeBalance = await walletRepository.create({
+				userId: referreeId,
+			});
+		}
+		await walletRepository.update(referreeBalance[0].id, {
+			portfolioBalance: (referreeBalance[0].portfolioBalance += amount),
 		});
 	}
 

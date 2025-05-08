@@ -26,7 +26,7 @@ export class WishlistController {
 			throw new AppError('Failed to add Watchlist', 500);
 		}
 
-		return AppResponse(res, 200, toJSON([wishlist]), 'Watchlist added successfully');
+		return AppResponse(res, 201, toJSON([wishlist]), 'Watchlist added successfully');
 	});
 
 	findAll = catchAsync(async (req: Request, res: Response) => {

@@ -25,5 +25,12 @@ export enum KycStatus {
 export enum TransactionStatus {
 	COMPLETED = 'completed',
 	PENDING = 'pending',
-	FAILED = 'failed'
+	FAILED = 'failed',
+}
+
+export enum InvestmentType {
+	STOCKS = 'stocks',
+	RETIREMENT = 'retirement',
+	CRYPTO = 'crypto',
+	ETFS = 'etfs',
 }

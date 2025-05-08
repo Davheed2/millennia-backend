@@ -24,6 +24,7 @@ import {
 	wishlistRouter,
 	transactionRouter,
 	walletRouter,
+	investementRouter,
 } from '@/routes';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
@@ -174,6 +175,7 @@ app.use('/api/v1/assets', assetsRouter);
 app.use('/api/v1/wishlist', wishlistRouter);
 app.use('/api/v1/transaction', transactionRouter);
 app.use('/api/v1/wallet', walletRouter);
+app.use('/api/v1/investment', investementRouter);
 
 app.all('/{*splat}', async (req, res) => {
 	logger.error('route not found ' + new Date(Date.now()) + ' ' + req.originalUrl);

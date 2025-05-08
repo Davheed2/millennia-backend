@@ -24,13 +24,15 @@ class WishlistRepository {
 
 	findByUserId = async (
 		userId: string
-	): Promise<{ wishlist: IWishlist; metrics: { change_percentage: number; price: number } }[]> => {
+	): Promise<
+		{ wishlist: IWishlist; metrics: { change_percentage: number; price: number; performance_ytd: number } }[]
+	> => {
 		const wishlistWithMetrics = await knexDb
 			.table('wishlist')
 			.join('assets', 'wishlist.symbol', 'assets.symbol')
 			.join('asset_metrics', 'assets.id', 'asset_metrics.asset_id')
 			.where({ 'wishlist.userId': userId, 'wishlist.isDeleted': false })
-			.select('wishlist.*', 'asset_metrics.change_percentage', 'asset_metrics.price');
+			.select('wishlist.*', 'asset_metrics.change_percentage', 'asset_metrics.price', 'asset_metrics.performance_ytd');
 
 		return wishlistWithMetrics.map((item) => ({
 			wishlist: {
@@ -46,6 +48,7 @@ class WishlistRepository {
 			metrics: {
 				change_percentage: item.change_percentage,
 				price: item.price,
+				performance_ytd: item.performance_ytd,
 			},
 		}));
 	};

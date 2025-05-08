@@ -87,7 +87,7 @@ export class KycController {
 			throw new AppError('Failed to submit kyc', 500);
 		}
 
-		return AppResponse(res, 200, toJSON([kyc]), 'KYC submitted successfully');
+		return AppResponse(res, 201, toJSON([kyc]), 'KYC submitted successfully');
 	});
 
 	findByUserId = catchAsync(async (req: Request, res: Response) => {

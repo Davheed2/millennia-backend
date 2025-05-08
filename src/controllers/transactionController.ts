@@ -46,6 +46,11 @@ export class TransactionController {
 			paymentProof = secureUrl;
 		}
 
+		let wallet = await walletRepository.findByUserId(user.id);
+		if (!wallet || wallet.length === 0) {
+			wallet = await walletRepository.create({ userId: user.id });
+		}
+
 		const reference = referenceGenerator();
 		const transaction = await transactionRepository.create({
 			userId: user.id,
