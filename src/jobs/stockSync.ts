@@ -78,7 +78,7 @@ async function fetchAndUpdateAssets() {
 						asset_id: id,
 						price: quote.price,
 						change_dollar: quote.change,
-						change_percentage: quote.changesPercentage,
+						change_percentage: performance_ytd_value || null,
 						volume: quote.volume,
 						market_cap: quote.marketCap,
 						fifty_two_week_high: quote.yearHigh,
@@ -98,7 +98,7 @@ async function fetchAndUpdateAssets() {
 					.merge({
 						price: quote.price,
 						change_dollar: quote.change,
-						change_percentage: quote.changesPercentage,
+						change_percentage: performance_ytd_value || null,
 						volume: quote.volume,
 						market_cap: quote.marketCap,
 						fifty_two_week_high: quote.yearHigh,
