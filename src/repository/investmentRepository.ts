@@ -31,9 +31,23 @@ class InvestmentRepository {
 			performance_ytd: number | null;
 		}[]
 	> => {
-		const investment = await knexDb
+		// Step 1: Get base investment
+		const baseInvestment = await knexDb
 			.table('investments')
 			.where({ 'investments.id': id, 'investments.isDeleted': false })
+			.first();
+
+		if (!baseInvestment) return [];
+
+		// Step 2: Aggregate all matching investments
+		const investmentGroup = await knexDb
+			.table('investments')
+			.where({
+				'investments.userId': baseInvestment.userId,
+				'investments.symbol': baseInvestment.symbol,
+				'investments.type': baseInvestment.type,
+				'investments.isDeleted': false,
+			})
 			.select(
 				'investments.symbol',
 				'investments.type',
@@ -63,7 +77,7 @@ class InvestmentRepository {
 				'asset_metrics.performance_ytd'
 			);
 
-		return investment;
+		return investmentGroup;
 	};
 
 	findByUserId = async (
