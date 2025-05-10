@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { AppError, AppResponse, logger, toJSON } from '@/common/utils';
+import { AppError, AppResponse, logger, referenceGenerator, toJSON } from '@/common/utils';
 import { catchAsync } from '@/middlewares';
 import { investmentRepository, walletRepository } from '@/repository';
-import { referralService } from '@/services';
+import { referralService, Transaction } from '@/services';
 
 export class InvestmentController {
 	create = catchAsync(async (req: Request, res: Response) => {
@@ -92,7 +92,7 @@ export class InvestmentController {
 			initialAmount: amount,
 			name,
 			percentageProfit: percentage,
-			dailyProfit: 0
+			dailyProfit: 0,
 		});
 		if (investment) {
 			const updatedWallet = await walletRepository.update(walletBalance[0].id, {
@@ -115,7 +115,16 @@ export class InvestmentController {
 
 		setImmediate(async () => {
 			try {
+				const reference = referenceGenerator();
 				await referralService.processReferralInvestment(user.id);
+
+				await Transaction.add({
+					userId: user.id,
+					amount,
+					type: 'Investment',
+					description: `${plan} plan investment in ${symbol}`,
+					reference,
+				});
 			} catch (error) {
 				logger.error(error);
 			}
