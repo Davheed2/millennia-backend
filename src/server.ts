@@ -163,7 +163,9 @@ app.use((req: Request, res: Response, next: NextFunction) => {
  * Initialize routes
  */
 app.use(validateDataWithZod);
-fetchAndUpdateAssets();
+if (ENVIRONMENT.APP.ENV === 'production') {
+	fetchAndUpdateAssets();
+}
 app.use('/api/v1/alive', (req: Request, res: Response) => {
 	res.status(200).json({ status: 'success', message: 'Server is up and running' });
 });
