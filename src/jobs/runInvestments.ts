@@ -2,8 +2,8 @@ import cron from 'node-cron';
 import { runDailyInvestmentCron } from './investments';
 
 // Schedule: Runs every day at 00:00 (midnight)
-// cron.schedule('0 0 * * *', async () => {
-cron.schedule('* * * * *', async () => {
+cron.schedule('0 0 * * *', async () => {
+// cron.schedule('* * * * *', async () => {
 	console.log('Starting daily investment cron...');
 	try {
 		await runDailyInvestmentCron();
