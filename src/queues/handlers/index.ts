@@ -29,8 +29,10 @@ import {
 import { Job } from 'bullmq';
 
 const transporter = nodemailer.createTransport({
-	service: 'gmail',
+	//service: 'gmail',
+	host: 'smtp.zeptomail.com',
 	port: 587,
+	secure: false,
 	auth: {
 		user: ENVIRONMENT.EMAIL.GMAIL_USER,
 		pass: ENVIRONMENT.EMAIL.GMAIL_PASSWORD,
@@ -95,7 +97,7 @@ export const sendEmail = async (job: Job<EmailJobData>) => {
 	}
 
 	const mailOptions = {
-		from: `"Millennia Trades" <${ENVIRONMENT.EMAIL.GMAIL_USER}>`,
+		from: `"Millennia Trades" <support@millenniatrades.com`,
 		to: data.to,
 		subject: subject,
 		html: htmlContent,

@@ -27,7 +27,15 @@ export async function runDailyInvestmentCron() {
 			case 'premium':
 				profit = 1400; // fixed daily
 				break;
-			// Add cases for other plans like gold, platinum, diamond later
+			case 'gold':
+				profit = getFluctuatingProfit(833, 700, 850); // Fluctuates
+				break;
+			case 'platinum':
+				profit = getFluctuatingProfit(2500, 2000, 2600); // Fluctuates
+				break;
+			case 'diamond':
+				profit = getFluctuatingProfit(5500, 5000, 5800); // Fluctuates
+				break;
 			default:
 				continue;
 		}

@@ -114,7 +114,7 @@ export const baseTemplate = (template: string): string => {
             <table class="email-content" cellpadding="0" cellspacing="0">
               <tr>
                 <td class="email-masthead">
-                  <img src="https://res.cloudinary.com/dnhu3eqn5/image/upload/v1741486702/100minds_r7zz76.jpg" 
+                  <img src="https://res.cloudinary.com/dnhu3eqn5/image/upload/v1746912743/millennnia_i45qza.png" 
                        alt="100minds logo" 
                        width="100" 
                        height="auto" 

@@ -22,12 +22,12 @@ export class InvestmentController {
 		const plusPercentage = 6.33;
 		const premiumPlan = 15000;
 		const premiumPercentage = 9.33;
-		const goldPlan = 1000;
-		//const goldPercentage = 10;
+		const goldPlan = 10000;
+		const goldPercentage = 8.33;
 		const platinumPlan = 25000;
-		//const platinumPercentage = 10;
+		const platinumPercentage = 10.0;
 		const diamondPlan = 50000;
-		//const diamondPercentage = 10;
+		const diamondPercentage = 11.0;
 
 		let walletBalance = await walletRepository.findByUserId(user.id);
 		if (!walletBalance || walletBalance.length === 0) {
@@ -61,18 +61,21 @@ export class InvestmentController {
 		}
 		if (plan === 'gold') {
 			amount = goldPlan;
+			percentage = goldPercentage;
 			if (walletBalance[0].balance < goldPlan) {
 				throw new AppError('Insufficient Balance', 400);
 			}
 		}
 		if (plan === 'platinum') {
 			amount = platinumPlan;
+			percentage = platinumPercentage;
 			if (walletBalance[0].balance < platinumPlan) {
 				throw new AppError('Insufficient Balance', 400);
 			}
 		}
 		if (plan === 'diamond') {
 			amount = diamondPlan;
+			percentage = diamondPercentage;
 			if (walletBalance[0].balance < diamondPlan) {
 				throw new AppError('Insufficient Balance', 400);
 			}
@@ -89,6 +92,7 @@ export class InvestmentController {
 			initialAmount: amount,
 			name,
 			percentageProfit: percentage,
+			dailyProfit: 0
 		});
 		if (investment) {
 			const updatedWallet = await walletRepository.update(walletBalance[0].id, {
