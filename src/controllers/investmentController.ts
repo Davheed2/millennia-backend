@@ -17,8 +17,18 @@ export class InvestmentController {
 		if (!symbol) throw new AppError('Symbol is required', 400);
 
 		const basicPlan = 3000;
+		const basicPercentage = 4.93;
 		const plusPlan = 7000;
+		const plusPercentage = 6.33;
 		const premiumPlan = 15000;
+		const premiumPercentage = 9.33;
+		const goldPlan = 1000;
+		//const goldPercentage = 10;
+		const platinumPlan = 25000;
+		//const platinumPercentage = 10;
+		const diamondPlan = 50000;
+		//const diamondPercentage = 10;
+
 		let walletBalance = await walletRepository.findByUserId(user.id);
 		if (!walletBalance || walletBalance.length === 0) {
 			walletBalance = await walletRepository.create({
@@ -27,21 +37,43 @@ export class InvestmentController {
 		}
 
 		let amount = 0;
+		let percentage = 0;
 		if (plan === 'basic') {
 			amount = basicPlan;
+			percentage = basicPercentage;
 			if (walletBalance[0].balance < basicPlan) {
 				throw new AppError('Insufficient Balance', 400);
 			}
 		}
 		if (plan === 'plus') {
 			amount = plusPlan;
+			percentage = plusPercentage;
 			if (walletBalance[0].balance < plusPlan) {
 				throw new AppError('Insufficient Balance', 400);
 			}
 		}
 		if (plan === 'premium') {
 			amount = premiumPlan;
+			percentage = premiumPercentage;
 			if (walletBalance[0].balance < premiumPlan) {
+				throw new AppError('Insufficient Balance', 400);
+			}
+		}
+		if (plan === 'gold') {
+			amount = goldPlan;
+			if (walletBalance[0].balance < goldPlan) {
+				throw new AppError('Insufficient Balance', 400);
+			}
+		}
+		if (plan === 'platinum') {
+			amount = platinumPlan;
+			if (walletBalance[0].balance < platinumPlan) {
+				throw new AppError('Insufficient Balance', 400);
+			}
+		}
+		if (plan === 'diamond') {
+			amount = diamondPlan;
+			if (walletBalance[0].balance < diamondPlan) {
 				throw new AppError('Insufficient Balance', 400);
 			}
 		}
@@ -55,7 +87,8 @@ export class InvestmentController {
 			retirementAccountType,
 			amount,
 			initialAmount: amount,
-			name
+			name,
+			percentageProfit: percentage,
 		});
 		if (investment) {
 			const updatedWallet = await walletRepository.update(walletBalance[0].id, {
@@ -103,6 +136,7 @@ export class InvestmentController {
 		const { investmentId } = req.query;
 
 		if (!user) throw new AppError('Please log in again', 400);
+		if (!investmentId) new AppError('Investment ID is required', 400);
 
 		const investment = await investmentRepository.findById(investmentId as string);
 		if (!investment) {

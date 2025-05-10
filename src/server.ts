@@ -38,6 +38,7 @@ import http from 'http';
 import morgan from 'morgan';
 import { startAllQueuesAndWorkers, stopAllQueuesAndWorkers } from './queues';
 import { fetchAndUpdateAssets } from './jobs/stockSync';
+import './jobs/runInvestments';
 
 dotenv.config();
 /**
@@ -162,7 +163,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
  * Initialize routes
  */
 app.use(validateDataWithZod);
-//fetchAndUpdateAssets();
+fetchAndUpdateAssets();
 app.use('/api/v1/alive', (req: Request, res: Response) => {
 	res.status(200).json({ status: 'success', message: 'Server is up and running' });
 });

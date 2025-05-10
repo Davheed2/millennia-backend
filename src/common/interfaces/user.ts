@@ -26,6 +26,8 @@ export interface IUser {
 	referralCode: string;
 	referralCredits?: number;
 	isKycVerified: boolean;
+	dailyProfitChange: number;
+	totalProfit: number;
 	isDeleted: boolean;
 	created_at?: Date;
 	updated_at?: Date;

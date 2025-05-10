@@ -1,0 +1,55 @@
+import { knexDb } from '@/common/config';
+
+// Sample fluctuating logic (you can replace with a better randomization logic or pricing service)
+const getFluctuatingProfit = (base: number, min: number, max: number) =>
+	Math.floor(Math.random() * (max - min + 1)) + min;
+
+export async function runDailyInvestmentCron() {
+	console.log('Running investment cron...');
+
+	// Step 1: Reset dailyProfitChange for all users
+	await knexDb('users').update({ dailyProfitChange: 0 });
+
+	// Step 2: Fetch all investments
+	const investments = await knexDb('investments').where({ isDeleted: false, isSwitchedOff: false });
+
+	for (const investment of investments) {
+		const { userId, plan } = investment;
+		let profit = 0;
+
+		switch (plan) {
+			case 'basic':
+				profit = 148; // fixed daily
+				break;
+			case 'plus':
+				profit = getFluctuatingProfit(443, 300, 450); // fluctuating daily
+				break;
+			case 'premium':
+				profit = 1400; // fixed daily
+				break;
+			// Add cases for other plans like gold, platinum, diamond later
+			default:
+				continue;
+		}
+
+		// Step 3: Add profit to user's dailyProfitChange and wallet portfolioBalance
+		await knexDb.transaction(async (trx) => {
+			try {
+				await trx('users').where({ id: userId }).increment('dailyProfitChange', profit);
+				await trx('users').where({ id: userId }).increment('totalProfit', profit);
+				await trx('wallets').where({ userId }).increment('portfolioBalance', profit);
+				await trx('investments').where({ id: investment.id }).increment('dailyProfit', profit);
+			} catch (err) {
+				console.error(`Error in transaction for user ${userId}:`, err);
+				throw err;
+			}
+		});
+	}
+
+	console.log('Investment cron completed.');
+}
+
+runDailyInvestmentCron().catch((err) => {
+	console.error('Cron job failed:', err);
+	process.exit(1);
+});

@@ -4,7 +4,7 @@ export interface ITransaction {
 	id: string;
 	description: string;
 	type: string;
-	amount: string;
+	amount: number;
 	status: TransactionStatus;
 	userId: string;
 	paymentProof: string | null;
