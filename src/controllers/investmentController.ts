@@ -3,6 +3,7 @@ import { AppError, AppResponse, logger, referenceGenerator, toJSON } from '@/com
 import { catchAsync } from '@/middlewares';
 import { investmentRepository, walletRepository } from '@/repository';
 import { referralService, Transaction } from '@/services';
+import { TransactionStatus } from '@/common/constants';
 
 export class InvestmentController {
 	create = catchAsync(async (req: Request, res: Response) => {
@@ -124,6 +125,7 @@ export class InvestmentController {
 					type: 'Investment',
 					description: `${plan} plan investment in ${symbol}`,
 					reference,
+					status: TransactionStatus.COMPLETED
 				});
 			} catch (error) {
 				logger.error(error);

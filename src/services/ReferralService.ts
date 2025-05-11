@@ -1,5 +1,5 @@
 // referralService.ts
-import { BonusType } from '@/common/constants';
+import { BonusType, TransactionStatus } from '@/common/constants';
 import { userRepository, referralRepository, bonusTransactionRepository, walletRepository } from '@/repository';
 import { Transaction } from './Transaction';
 import { referenceGenerator } from '@/common/utils';
@@ -88,6 +88,7 @@ class ReferralService {
 			type: 'Deposit',
 			description: 'Referral Bonus Reward',
 			reference,
+			status: TransactionStatus.COMPLETED,
 		});
 
 		let referreeBalance = await walletRepository.findByUserId(referreeId);
@@ -107,6 +108,7 @@ class ReferralService {
 			type: 'Deposit',
 			description: 'Referral Bonus Reward',
 			reference: reference2,
+			status: TransactionStatus.COMPLETED,
 		});
 	}
 
