@@ -17,17 +17,17 @@ export class InvestmentController {
 		if (!symbol) throw new AppError('Symbol is required', 400);
 
 		const basicPlan = 3000;
-		const basicPercentage = 4.93;
+		const basicPercentage = 5;
 		const plusPlan = 7000;
-		const plusPercentage = 6.33;
+		const plusPercentage = 6;
 		const premiumPlan = 15000;
-		const premiumPercentage = 9.33;
+		const premiumPercentage = 9;
 		const goldPlan = 10000;
-		const goldPercentage = 8.33;
+		const goldPercentage = 8;
 		const platinumPlan = 25000;
-		const platinumPercentage = 10.0;
+		const platinumPercentage = 10;
 		const diamondPlan = 50000;
-		const diamondPercentage = 11.0;
+		const diamondPercentage = 11;
 
 		let walletBalance = await walletRepository.findByUserId(user.id);
 		if (!walletBalance || walletBalance.length === 0) {

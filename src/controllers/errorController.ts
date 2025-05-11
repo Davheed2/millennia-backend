@@ -65,9 +65,9 @@ export const errorHandler = (err, req: Request, res: Response, next: NextFunctio
 				case err.name === 'TokenExpiredError':
 					error = handleJWTExpiredError();
 					break;
-				case err.code === '22P02':
-					error = handleInvalidUUIDError();
-					break;
+				// case err.code === '22P02':
+				// 	error = handleInvalidUUIDError();
+				// 	break;
 				default:
 					break;
 			}
