@@ -12,7 +12,7 @@ class TransactionRepository {
 	};
 
 	findByUserId = async (userId: string): Promise<ITransaction[]> => {
-		return await knexDb.table('transactions').where({ userId }).select('*');
+		return await knexDb.table('transactions').where({ userId }).orderBy('created_at', 'desc');
 	};
 
 	update = async (id: string, payload: Partial<ITransaction>): Promise<ITransaction[]> => {
