@@ -50,6 +50,8 @@ export const errorHandler = (err, req: Request, res: Response, next: NextFunctio
 	err.status = err?.status || 'Error';
 	let error = err;
 
+	console.log(err)
+
 	switch (ENVIRONMENT.APP.ENV) {
 		case 'development':
 			logger.error(`${err.statusCode} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
