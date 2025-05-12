@@ -189,6 +189,61 @@ class AuthController {
 		return AppResponse(res, 200, toJSON([user]), 'User logged in successfully');
 	});
 
+	adminSignIn = catchAsync(async (req: Request, res: Response) => {
+		const { email, password } = req.body;
+
+		if (!email || !password) {
+			throw new AppError('Incomplete login data', 401);
+		}
+
+		const user = await userRepository.findByEmail(email);
+		if (!user) {
+			throw new AppError('User not found', 404);
+		}
+		if (user.role === 'user') {
+			throw new AppError('Unauthorized access', 401);
+		}
+
+		const currentRequestTime = DateTime.now();
+		const lastLoginRetry = currentRequestTime.diff(DateTime.fromISO(user.lastLogin.toISOString()), 'hours');
+
+		if (user.loginRetries >= 5 && Math.round(lastLoginRetry.hours) < 12) {
+			throw new AppError('login retries exceeded!', 401);
+		}
+
+		const isPasswordValid = await comparePassword(password, user.password);
+		if (!isPasswordValid) {
+			await userRepository.update(user.id, { loginRetries: user.loginRetries + 1 });
+			throw new AppError('Invalid credentials', 401);
+		}
+
+		if (!user.isEmailVerified) {
+			throw new AppError('Your account is not yet verified', 401);
+		}
+		if (user.isSuspended) {
+			throw new AppError('Your account is currently suspended', 401);
+		}
+		if (user.isDeleted) {
+			throw new AppError('Your account is currently deleted', 401);
+		}
+
+		const accessToken = generateAccessToken(user.id);
+		const refreshToken = generateRefreshToken(user.id);
+
+		setCookie(req, res, 'accessToken', accessToken, parseTokenDuration(ENVIRONMENT.JWT_EXPIRES_IN.ACCESS));
+		setCookie(req, res, 'refreshToken', refreshToken, parseTokenDuration(ENVIRONMENT.JWT_EXPIRES_IN.REFRESH));
+
+		await userRepository.update(user.id, {
+			loginRetries: 0,
+			lastLogin: currentRequestTime.toJSDate(),
+		});
+
+		//login email
+		const loginTime = DateTime.now().toFormat("cccc, LLLL d, yyyy 'at' t");
+		await sendLoginEmail(user.email, user.firstName, loginTime);
+		return AppResponse(res, 200, toJSON([user]), 'User logged in successfully');
+	});
+
 	signOut = catchAsync(async (req: Request, res: Response) => {
 		const { user } = req;
 
