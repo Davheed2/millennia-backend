@@ -21,6 +21,14 @@ class TransactionRepository {
 			.update({ ...payload, updated_at: DateTime.now().toJSDate() })
 			.returning('*');
 	};
+
+	findDeposits = async (): Promise<ITransaction[]> => {
+		return await knexDb.table('transactions').where({ type: 'Deposit' }).orderBy('created_at', 'desc');
+	};
+
+	findWithdrawals = async (): Promise<ITransaction[]> => {
+		return await knexDb.table('transactions').where({ type: 'withdrawal' }).orderBy('created_at', 'desc');
+	};
 }
 
 export const transactionRepository = new TransactionRepository();

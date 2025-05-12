@@ -10,5 +10,9 @@ router.get('/user', transactionController.findByUserId);
 router.post('/deposit', multerUpload.single('paymentProof'), transactionController.walletTopUp);
 router.post('/withdraw', transactionController.withdrawFunds);
 router.post('/update', transactionController.updateTransaction);
+router.post('/update/deposit', transactionController.updateDeposit);
+router.post('/update/withdrawal', transactionController.updateWithdrawal);
+router.get('/deposits', transactionController.fetchDeposits);
+router.get('/withdrawals', transactionController.fetchWithdrawals);
 
 export { router as transactionRouter };
