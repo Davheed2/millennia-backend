@@ -8,8 +8,10 @@ import {
 	KycData,
 	ProcessingDepositData,
 	SuccessfulDepositData,
+	FailedDepositData,
 	ProcessingWithdrawalData,
 	SuccessfulWithdrawalData,
+	FailedWithdrawalData,
 } from '@/common/interfaces';
 import { logger } from '@/common/utils';
 import nodemailer from 'nodemailer';
@@ -23,8 +25,10 @@ import {
 	KycEmail,
 	DepositProcessingEmail,
 	DepositSuccessEmail,
+	DepositFailedEmail,
 	WithdrawalProcessingEmail,
 	WithdrawalSuccessEmail,
+	WithdrawalFailedEmail,
 } from '../templates';
 import { Job } from 'bullmq';
 
@@ -82,6 +86,10 @@ export const sendEmail = async (job: Job<EmailJobData>) => {
 			htmlContent = DepositSuccessEmail(data as SuccessfulDepositData);
 			subject = 'Successful Deposit';
 			break;
+		case 'failedDeposit':
+			htmlContent = DepositFailedEmail(data as FailedDepositData);
+			subject = 'Failed Deposit';
+			break;
 		case 'processingWithdrawal':
 			htmlContent = WithdrawalProcessingEmail(data as ProcessingWithdrawalData);
 			subject = 'Your withdrawal request is being processed';
@@ -89,6 +97,10 @@ export const sendEmail = async (job: Job<EmailJobData>) => {
 		case 'successfulWithdrawal':
 			htmlContent = WithdrawalSuccessEmail(data as SuccessfulWithdrawalData);
 			subject = 'Successful Withdrawal';
+			break;
+		case 'failedWithdrawal':
+			htmlContent = WithdrawalFailedEmail(data as FailedWithdrawalData);
+			subject = 'Failed Withdrawal';
 			break;
 
 		// Handle other email types...

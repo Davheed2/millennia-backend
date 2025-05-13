@@ -43,6 +43,12 @@ export interface SuccessfulDepositData extends CommonDataFields {
 	reference: string;
 }
 
+export interface FailedDepositData extends CommonDataFields {
+	name: string;
+	amount: number;
+	reference: string;
+}
+
 export interface ProcessingWithdrawalData extends CommonDataFields {
 	name: string;
 	amount: number;
@@ -50,6 +56,12 @@ export interface ProcessingWithdrawalData extends CommonDataFields {
 }
 
 export interface SuccessfulWithdrawalData extends CommonDataFields {
+	name: string;
+	amount: number;
+	reference: string;
+}
+
+export interface FailedWithdrawalData extends CommonDataFields {
 	name: string;
 	amount: number;
 	reference: string;
@@ -64,5 +76,7 @@ export type EmailJobData =
 	| { type: 'kyc'; data: KycData }
 	| { type: 'processingDeposit'; data: ProcessingDepositData }
 	| { type: 'successfulDeposit'; data: SuccessfulDepositData }
+	| { type: 'failedDeposit'; data: FailedDepositData }
 	| { type: 'processingWithdrawal'; data: ProcessingWithdrawalData }
-	| { type: 'successfulWithdrawal'; data: SuccessfulWithdrawalData };
+	| { type: 'successfulWithdrawal'; data: SuccessfulWithdrawalData }
+	| { type: 'failedWithdrawal'; data: FailedWithdrawalData };

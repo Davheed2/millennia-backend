@@ -9,3 +9,5 @@ export * from './processingDepositEmail';
 export * from './successfulDepositEmail';
 export * from './processingWithdrawalEmail';
 export * from './successfulWithdrawal';
+export * from './failedDepositEmail';
+export * from './failedWithdrawalEmail';

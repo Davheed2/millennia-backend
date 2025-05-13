@@ -22,12 +22,20 @@ class TransactionRepository {
 			.returning('*');
 	};
 
-	findDeposits = async (): Promise<ITransaction[]> => {
-		return await knexDb.table('transactions').where({ type: 'Deposit' }).orderBy('created_at', 'desc');
+	findDeposits = async () => {
+		return await knexDb('transactions')
+			.where({ type: 'Deposit' })
+			.orderBy('transactions.created_at', 'desc')
+			.join('users', 'transactions.userId', 'users.id')
+			.select('transactions.*', 'users.firstName', 'users.lastName');
 	};
 
-	findWithdrawals = async (): Promise<ITransaction[]> => {
-		return await knexDb.table('transactions').where({ type: 'withdrawal' }).orderBy('created_at', 'desc');
+	findWithdrawals = async () => {
+		return await knexDb('transactions')
+			.where({ type: 'withdrawal' })
+			.orderBy('transactions.created_at', 'desc')
+			.join('users', 'transactions.userId', 'users.id')
+			.select('transactions.*', 'users.firstName', 'users.lastName');
 	};
 }
 

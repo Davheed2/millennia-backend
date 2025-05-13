@@ -3,6 +3,8 @@ import {
 	AppError,
 	AppResponse,
 	referenceGenerator,
+	sendFailedDepositEmail,
+	sendFailedWithdrawalEmail,
 	sendProcessingDepositEmail,
 	sendProcessingWithdrawalEmail,
 	sendSuccessfulDepositEmail,
@@ -155,14 +157,23 @@ export class TransactionController {
 			await walletRepository.update(userWallet[0].id, {
 				balance: (userWallet[0].balance += transaction.amount),
 			});
+
+			await sendSuccessfulDepositEmail(
+				extinguishUser.email,
+				extinguishUser.firstName,
+				transaction.amount,
+				transaction.reference
+			);
+		}
+		if (status === 'failed') {
+			await sendFailedDepositEmail(
+				extinguishUser.email,
+				extinguishUser.firstName,
+				transaction.amount,
+				transaction.reference
+			);
 		}
 
-		await sendSuccessfulDepositEmail(
-			extinguishUser.email,
-			extinguishUser.firstName,
-			transaction.amount,
-			transaction.reference
-		);
 		return AppResponse(res, 200, toJSON(update), 'Transaction updated successfully');
 	});
 
@@ -226,14 +237,24 @@ export class TransactionController {
 				balance: newBalance,
 				portfolioBalance: newPortfolioBalance,
 			});
+
+			await sendSuccessfulWithdrawalEmail(
+				extinguishUser.email,
+				extinguishUser.firstName,
+				transaction.amount,
+				transaction.reference
+			);
 		}
 
-		await sendSuccessfulWithdrawalEmail(
-			extinguishUser.email,
-			extinguishUser.firstName,
-			transaction.amount,
-			transaction.reference
-		);
+		if (status === 'failed') {
+			await sendFailedWithdrawalEmail(
+				extinguishUser.email,
+				extinguishUser.firstName,
+				transaction.amount,
+				transaction.reference
+			);
+		}
+
 		return AppResponse(res, 200, toJSON(update), 'Transaction updated successfully');
 	});
 

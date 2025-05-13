@@ -15,6 +15,8 @@ import {
 	SuccessfulDepositData,
 	ProcessingWithdrawalData,
 	SuccessfulWithdrawalData,
+	FailedDepositData,
+	FailedWithdrawalData,
 } from '../interfaces';
 import type { Response, Request } from 'express';
 import { promisify } from 'util';
@@ -438,6 +440,26 @@ const sendSuccessfulDepositEmail = async (
 	});
 };
 
+const sendFailedDepositEmail = async (
+	email: string,
+	name: string,
+	amount: number,
+	reference: string
+): Promise<void> => {
+	const emailData: FailedDepositData = {
+		to: email,
+		priority: 'high',
+		name,
+		amount,
+		reference,
+	};
+
+	addEmailToQueue({
+		type: 'failedDeposit',
+		data: emailData,
+	});
+};
+
 const sendProcessingWithdrawalEmail = async (
 	email: string,
 	name: string,
@@ -478,6 +500,26 @@ const sendSuccessfulWithdrawalEmail = async (
 	});
 };
 
+const sendFailedWithdrawalEmail = async (
+	email: string,
+	name: string,
+	amount: number,
+	reference: string
+): Promise<void> => {
+	const emailData: FailedWithdrawalData = {
+		to: email,
+		priority: 'high',
+		name,
+		amount,
+		reference,
+	};
+
+	addEmailToQueue({
+		type: 'failedWithdrawal',
+		data: emailData,
+	});
+};
+
 export {
 	dateFromString,
 	generateRandom6DigitKey,
@@ -508,6 +550,8 @@ export {
 	sendKycEmail,
 	sendProcessingDepositEmail,
 	sendSuccessfulDepositEmail,
+	sendFailedDepositEmail,
 	sendProcessingWithdrawalEmail,
 	sendSuccessfulWithdrawalEmail,
+	sendFailedWithdrawalEmail,
 };
