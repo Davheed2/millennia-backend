@@ -12,3 +12,4 @@ export * from './wishlist';
 export * from './transaction';
 export * from './wallet';
 export * from './investment';
+export * from './statistics'

@@ -1,5 +1,5 @@
 import { knexDb } from '@/common/config';
-import { IUser } from '@/common/interfaces';
+import { IUser, Statistics } from '@/common/interfaces';
 import { DateTime } from 'luxon';
 
 class UserRepository {
@@ -98,6 +98,30 @@ class UserRepository {
 
 	getCompanyPhone = async () => {
 		return await knexDb.table('sys_phone').orderBy('created_at', 'desc');
+	};
+
+	findStats = async (): Promise<Statistics> => {
+		const totalUsers = await knexDb('users').where({ isDeleted: false }).count('* as count').first();
+		const totalInvestments = await knexDb('investments').where({ isDeleted: false }).count('* as count').first();
+		const totalKyc = await knexDb('kyc').count('* as count').first();
+		const totalDeposits = await knexDb('transactions')
+			.where({ type: 'Deposit' })
+			.whereIn('status', ['completed'])
+			.sum('amount as total')
+			.first();
+		const totalWithdrawals = await knexDb('transactions')
+			.where({ type: 'withdrawal' })
+			.whereIn('status', ['completed'])
+			.sum('amount as total')
+			.first();
+
+		return {
+			totalUsers: Number(totalUsers?.count) || 0,
+			totalInvestments: Number(totalInvestments?.count) || 0,
+			totalDeposits: Number(totalDeposits?.total) || 0,
+			totalWithdrawals: Number(totalWithdrawals?.total) || 0,
+			totalKyc: Number(totalKyc?.count) || 0,
+		};
 	};
 }
 
