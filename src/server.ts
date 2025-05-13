@@ -83,6 +83,9 @@ app.use(
 		origin: [
 			'https://millenniatrades.com',
 			'https://www.millenniatrades.com',
+			'https://millennia-admin.vercel.app',
+			'https://admin.millenniatrades.com',
+			'https://www.admin.millenniatrades.com',
 			'http://localhost:5173',
 			'http://localhost:3000',
 			'http://localhost:3001',
