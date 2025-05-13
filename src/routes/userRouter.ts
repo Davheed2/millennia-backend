@@ -15,4 +15,7 @@ router.post('/suspend-user', userController.suspendUser);
 router.post('/make-admin', userController.makeAdmin);
 router.get('/delete-account', userController.deleteAccount);
 
+router.get('/company', userController.getCompanyPhone);
+router.post('/company-phone', userController.updateCompanyPhone);
+
 export { router as userRouter };

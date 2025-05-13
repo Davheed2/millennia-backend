@@ -88,6 +88,17 @@ class UserRepository {
 	findByIsDeleted = async (isDeleted: boolean) => {
 		return await knexDb.table('users').where({ isDeleted });
 	};
+
+	updateCompanyPhone = async (id: number, payload: Partial<IUser>): Promise<IUser[]> => {
+		return await knexDb('sys_phone')
+			.where({ id })
+			.update({ ...payload, updated_at: DateTime.now().toJSDate() })
+			.returning('*');
+	};
+
+	getCompanyPhone = async () => {
+		return await knexDb.table('sys_phone').orderBy('created_at', 'desc');
+	};
 }
 
 export const userRepository = new UserRepository();

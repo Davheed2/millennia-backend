@@ -213,6 +213,46 @@ export class UserController {
 
 		return AppResponse(res, 200, null, `Account deleted successfully`);
 	});
+
+	getCompanyPhone = catchAsync(async (req: Request, res: Response) => {
+		const { user } = req;
+
+		if (!user) {
+			throw new AppError('Please log in again', 401);
+		}
+		if (user.role === 'user') {
+			throw new AppError('Unauthorized', 403);
+		}
+
+		const phone = await userRepository.getCompanyPhone();
+		if (!phone) {
+			throw new AppError(`Company Phone not found`, 500);
+		}
+
+		return AppResponse(res, 200, toJSON(phone), `Company Phone fetched successfully`);
+	});
+
+	updateCompanyPhone = catchAsync(async (req: Request, res: Response) => {
+		const { user } = req;
+		const { phone } = req.body;
+
+		if (!user) {
+			throw new AppError('Please log in again', 400);
+		}
+		if (user.role === 'user') {
+			throw new AppError('Unauthorized', 403);
+		}
+		if (!phone) {
+			throw new AppError('Phone is required', 401);
+		}
+
+		const updateProfile = await userRepository.updateCompanyPhone(1, { phone });
+		if (!updateProfile) {
+			throw new AppError('Failed to update company phone', 500);
+		}
+
+		return AppResponse(res, 200, toJSON(updateProfile), 'Company phone updated successfully');
+	});
 }
 
 export const userController = new UserController();
