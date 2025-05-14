@@ -73,10 +73,6 @@ export class MessageController {
 			throw new AppError('Message not found', 404);
 		}
 
-		if (message.recipientId !== user.id) {
-			throw new AppError('Unauthorized to mark this message as read', 403);
-		}
-
 		if (message.status === MessageStatus.READ) {
 			return AppResponse(res, 200, toJSON(message), 'Message already marked as read');
 		}
