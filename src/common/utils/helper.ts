@@ -17,6 +17,8 @@ import {
 	SuccessfulWithdrawalData,
 	FailedDepositData,
 	FailedWithdrawalData,
+	NewMessageData,
+	AdminNewMessageData,
 } from '../interfaces';
 import type { Response, Request } from 'express';
 import { promisify } from 'util';
@@ -520,6 +522,32 @@ const sendFailedWithdrawalEmail = async (
 	});
 };
 
+const sendNewMessageEmail = async (email: string, name: string): Promise<void> => {
+	const emailData: NewMessageData = {
+		to: email,
+		priority: 'high',
+		name,
+	};
+
+	addEmailToQueue({
+		type: 'newMessage',
+		data: emailData,
+	});
+};
+
+const sendAdminNewMessageEmail = async (email: string, name: string): Promise<void> => {
+	const emailData: AdminNewMessageData = {
+		to: email,
+		priority: 'high',
+		name,
+	};
+
+	addEmailToQueue({
+		type: 'adminNewMessage',
+		data: emailData,
+	});
+};
+
 export {
 	dateFromString,
 	generateRandom6DigitKey,
@@ -554,4 +582,6 @@ export {
 	sendProcessingWithdrawalEmail,
 	sendSuccessfulWithdrawalEmail,
 	sendFailedWithdrawalEmail,
+	sendNewMessageEmail,
+	sendAdminNewMessageEmail,
 };

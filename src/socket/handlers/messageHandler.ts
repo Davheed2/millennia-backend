@@ -1,8 +1,8 @@
 import { Server, Socket } from 'socket.io';
 import { MessageStatus, SocketEvents } from '@/common/constants';
 //import { saveMessage, markMessageAsRead } from '../services/messageService';
-import { logger } from '@/common/utils';
-import { messageRepository } from '@/repository';
+import { logger, sendAdminNewMessageEmail, sendNewMessageEmail } from '@/common/utils';
+import { messageRepository, userRepository } from '@/repository';
 
 export const messageHandler = (io: Server, socket: Socket) => {
 	const user = socket.data.user;
@@ -28,6 +28,22 @@ export const messageHandler = (io: Server, socket: Socket) => {
 
 			if (recipientSocket) {
 				recipientSocket.emit(SocketEvents.MESSAGE_RECEIVED, message);
+			}
+
+			//send message to all admins if the user has a role of user
+			const userRole = await userRepository.findById(senderId);
+			if (userRole?.role === 'user') {
+				const admins = await userRepository.findAllAdmins();
+				for (const admin of admins) {
+					if (admin.email && admin.firstName) {
+						await sendAdminNewMessageEmail(admin.email, admin.firstName);
+					}
+				}
+			} else if (userRole?.role === 'admin') {
+				const recipientUser = await userRepository.findById(recipientId);
+				if (recipientUser?.email && recipientUser?.firstName) {
+					await sendNewMessageEmail(recipientUser.email, recipientUser.firstName);
+				}
 			}
 
 			// Emit back to sender for confirmation
@@ -76,7 +92,7 @@ export const messageHandler = (io: Server, socket: Socket) => {
 			socket.emit('error', { message: 'Failed to mark message as read' });
 		}
 	});
-    
+
 	// Typing indicators
 	socket.on(SocketEvents.USER_TYPING, ({ recipientId }) => {
 		const recipientSocket = Array.from(io.sockets.sockets.values()).find((s) => s.data.user?.id === recipientId);

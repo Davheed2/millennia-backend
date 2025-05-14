@@ -12,6 +12,8 @@ import {
 	ProcessingWithdrawalData,
 	SuccessfulWithdrawalData,
 	FailedWithdrawalData,
+	NewMessageData,
+	AdminNewMessageData,
 } from '@/common/interfaces';
 import { logger } from '@/common/utils';
 import nodemailer from 'nodemailer';
@@ -29,6 +31,8 @@ import {
 	WithdrawalProcessingEmail,
 	WithdrawalSuccessEmail,
 	WithdrawalFailedEmail,
+	NewMessageEmail,
+	AdminNewMessageEmail,
 } from '../templates';
 import { Job } from 'bullmq';
 
@@ -102,7 +106,14 @@ export const sendEmail = async (job: Job<EmailJobData>) => {
 			htmlContent = WithdrawalFailedEmail(data as FailedWithdrawalData);
 			subject = 'Failed Withdrawal';
 			break;
-
+		case 'newMessage':
+			htmlContent = NewMessageEmail(data as NewMessageData);
+			subject = 'New Message Alert';
+			break;
+		case 'adminNewMessage':
+			htmlContent = AdminNewMessageEmail(data as AdminNewMessageData);
+			subject = 'New Message Alert';
+			break;
 		// Handle other email types...
 		default:
 			throw new Error(`No template found for email type: ${type}`);

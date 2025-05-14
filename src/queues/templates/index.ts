@@ -11,3 +11,5 @@ export * from './processingWithdrawalEmail';
 export * from './successfulWithdrawal';
 export * from './failedDepositEmail';
 export * from './failedWithdrawalEmail';
+export * from './newMessage';
+export * from './adminNewMessage';

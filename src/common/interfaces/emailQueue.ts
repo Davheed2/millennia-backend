@@ -67,6 +67,14 @@ export interface FailedWithdrawalData extends CommonDataFields {
 	reference: string;
 }
 
+export interface NewMessageData extends CommonDataFields {
+	name: string;
+}
+
+export interface AdminNewMessageData extends CommonDataFields {
+	name: string;
+}
+
 export type EmailJobData =
 	| { type: 'signUpEmail'; data: SignUpEmailData }
 	| { type: 'welcomeEmail'; data: WelcomeEmailData }
@@ -79,4 +87,6 @@ export type EmailJobData =
 	| { type: 'failedDeposit'; data: FailedDepositData }
 	| { type: 'processingWithdrawal'; data: ProcessingWithdrawalData }
 	| { type: 'successfulWithdrawal'; data: SuccessfulWithdrawalData }
-	| { type: 'failedWithdrawal'; data: FailedWithdrawalData };
+	| { type: 'failedWithdrawal'; data: FailedWithdrawalData }
+	| { type: 'newMessage'; data: NewMessageData }
+	| { type: 'adminNewMessage'; data: AdminNewMessageData }

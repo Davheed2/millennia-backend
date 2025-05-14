@@ -123,6 +123,10 @@ class UserRepository {
 			totalKyc: Number(totalKyc?.count) || 0,
 		};
 	};
+
+	findAllAdmins = async (): Promise<IUser[]> => {
+		return knexDb('users').where('role', 'admin').andWhere('isDeleted', false);
+	};
 }
 
 export const userRepository = new UserRepository();
