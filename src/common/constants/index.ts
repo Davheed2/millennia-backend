@@ -34,3 +34,31 @@ export enum InvestmentType {
 	CRYPTO = 'crypto',
 	ETFS = 'etfs',
 }
+
+export enum MessageStatus {
+	SENT = 'sent',
+	DELIVERED = 'delivered',
+	READ = 'read',
+}
+
+export enum SocketEvents {
+	// Connection events
+	CONNECT = 'connect',
+	DISCONNECT = 'disconnect',
+
+	// Authentication events
+	AUTH_ERROR = 'auth_error',
+
+	// Presence events
+	USER_ONLINE = 'user_online',
+	USER_OFFLINE = 'user_offline',
+	USER_TYPING = 'user_typing',
+	USER_STOP_TYPING = 'user_stop_typing',
+	ONLINE_USERS = 'online_users',
+
+	// Message events
+	SEND_MESSAGE = 'send_message',
+	MESSAGE_RECEIVED = 'message_received',
+	MESSAGE_READ = 'message_read',
+	GET_MESSAGES = 'get_messages'
+}

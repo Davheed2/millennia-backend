@@ -7,3 +7,4 @@ export * from './wishlistRouter';
 export * from './transactionRouter';
 export * from './walletRouter';
 export * from './investmentRouter';
+export * from './messageRouter';

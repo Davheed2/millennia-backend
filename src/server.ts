@@ -25,6 +25,7 @@ import {
 	transactionRouter,
 	walletRouter,
 	investementRouter,
+	messageRouter,
 } from '@/routes';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
@@ -39,6 +40,10 @@ import morgan from 'morgan';
 import { startAllQueuesAndWorkers, stopAllQueuesAndWorkers } from './queues';
 import { fetchAndUpdateAssets } from './jobs/stockSync';
 import './jobs/runInvestments';
+import './jobs/runMessages';
+import { Server as SocketIOServer } from 'socket.io';
+import { socketAuthMiddleware } from '@/middlewares/socketAuthMiddleware';
+import { initSocketHandlers } from './socket';
 
 dotenv.config();
 /**
@@ -182,6 +187,7 @@ app.use('/api/v1/wishlist', wishlistRouter);
 app.use('/api/v1/transaction', transactionRouter);
 app.use('/api/v1/wallet', walletRouter);
 app.use('/api/v1/investment', investementRouter);
+app.use('/api/v1/messages', messageRouter);
 
 app.all('/{*splat}', async (req, res) => {
 	logger.error('route not found ' + new Date(Date.now()) + ' ' + req.originalUrl);
@@ -200,6 +206,30 @@ app.all('/{*splat}', async (req, res) => {
 // to ensure all the express middlewares are set up before starting the socket server
 // including security headers and other middlewares
 const server = http.createServer(app);
+
+const io = new SocketIOServer(server, {
+	cors: {
+		origin: [
+			'https://millenniatrades.com',
+			'https://www.millenniatrades.com',
+			'https://millennia-admin.vercel.app',
+			'https://admin.millenniatrades.com',
+			'https://www.admin.millenniatrades.com',
+			'http://localhost:5173',
+			'http://localhost:3000',
+			'http://localhost:3001',
+		],
+		credentials: true,
+	},
+});
+
+// Apply socket middleware for authentication
+io.use(socketAuthMiddleware);
+// Initialize socket handlers
+initSocketHandlers(io);
+// Make io available throughout the application
+global.io = io;
+app.set('io', io);
 
 const appServer = server.listen(port, async () => {
 	await connectDb();
