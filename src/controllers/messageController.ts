@@ -64,9 +64,6 @@ export class MessageController {
 		if (!user) {
 			throw new AppError('Please log in again', 400);
 		}
-		if (user.role !== 'admin') {
-			throw new AppError('Unauthorized access', 401);
-		}
 		if (!messageId) {
 			throw new AppError('Message ID is required', 401);
 		}
