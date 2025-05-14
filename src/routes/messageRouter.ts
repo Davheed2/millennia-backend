@@ -8,5 +8,6 @@ router.use(protect);
 router.get('/user', messageController.getMessagesByUser);
 router.get('/admin-user', messageController.getMessagesByAdmin);
 router.get('/all-last-messages', messageController.getAllUsersWithLastMessages);
+router.get('/mark-as-read', messageController.readMessage);
 
 export { router as messageRouter };
