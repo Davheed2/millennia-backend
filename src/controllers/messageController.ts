@@ -28,7 +28,7 @@ export class MessageController {
 			throw new AppError('Please log in again', 400);
 		}
 		if (!userId) {
-			throw new AppError('User ID is required', 401);
+			throw new AppError('User ID is required', 400);
 		}
 
 		const messages = await messageRepository.getUserConversation(userId as string, userId as string);
