@@ -50,9 +50,9 @@ class MessageRepository {
 	getAllUsersLastMessage = async () => {
 		return await knexDb
 			.select(
-				'users.senderId',
-				'users.senderFirstName',
-				'users.senderLastName',
+				'users.id',
+				'users.firstName as senderFirstName',
+				'users.lastName as senderLastName',
 				'users.phone',
 				'users.photo as senderProfileImage',
 				'last_messages.content as lastMessage',
@@ -63,9 +63,9 @@ class MessageRepository {
 				knexDb('messages')
 					.select('id', 'senderId', 'recipientId', 'content', 'created_at')
 					.whereIn('id', function () {
-						this.select(knexDb.raw('MAX(id)'))
+						this.select(knexDb.raw('MAX("id")'))
 							.from('messages')
-							.groupByRaw('LEAST(senderId, recipientId), GREATEST(senderId, recipientId)');
+							.groupByRaw('LEAST("senderId", "recipientId"), GREATEST("senderId", "recipientId")');
 					})
 					.as('last_messages'),
 				function () {
