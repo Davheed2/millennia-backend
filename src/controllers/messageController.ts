@@ -49,7 +49,7 @@ export class MessageController {
 			throw new AppError('Unauthorized access', 401);
 		}
 
-		const messages = await messageRepository.getAllUsersLastMessage();
+		const messages = await messageRepository.getAllUsersLastMessage(user.id);
 		if (!messages) {
 			throw new AppError('No messages found', 404);
 		}

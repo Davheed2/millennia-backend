@@ -47,8 +47,36 @@ class MessageRepository {
 			.orderBy('messages.created_at', 'asc');
 	};
 
-	getAllUsersLastMessage = async () => {
-		return await knexDb
+	// getAllUsersLastMessage = async () => {
+	// 	return await knexDb
+	// 		.select(
+	// 			'users.id',
+	// 			'users.firstName as senderFirstName',
+	// 			'users.lastName as senderLastName',
+	// 			'users.phone',
+	// 			'users.photo as senderProfileImage',
+	// 			'last_messages.content as lastMessage',
+	// 			'last_messages.created_at'
+	// 		)
+	// 		.from('users')
+	// 		.leftJoin(
+	// 			knexDb('messages')
+	// 				.select('id', 'senderId', 'recipientId', 'content', 'created_at')
+	// 				.whereIn('id', function () {
+	// 					this.select(knexDb.raw('MAX("id")'))
+	// 						.from('messages')
+	// 						.groupByRaw('LEAST("senderId", "recipientId"), GREATEST("senderId", "recipientId")');
+	// 				})
+	// 				.as('last_messages'),
+	// 			function () {
+	// 				this.on('users.id', '=', 'last_messages.senderId').orOn('users.id', '=', 'last_messages.recipientId');
+	// 			}
+	// 		)
+	// 		.orderBy('last_messages.created_at', 'desc');
+	// };
+
+	getAllUsersLastMessage = async (currentUserId: string) => {
+		return await knexDb('users')
 			.select(
 				'users.id',
 				'users.firstName as senderFirstName',
@@ -58,18 +86,25 @@ class MessageRepository {
 				'last_messages.content as lastMessage',
 				'last_messages.created_at'
 			)
-			.from('users')
+			.whereNot('users.id', currentUserId)
 			.leftJoin(
 				knexDb('messages')
 					.select('id', 'senderId', 'recipientId', 'content', 'created_at')
 					.whereIn('id', function () {
 						this.select(knexDb.raw('MAX("id")'))
 							.from('messages')
-							.groupByRaw('LEAST("senderId", "recipientId"), GREATEST("senderId", "recipientId")');
+							.where(function () {
+								this.where('senderId', currentUserId).orWhere('recipientId', currentUserId);
+							}).groupByRaw(`
+							LEAST("senderId", "recipientId"), 
+							GREATEST("senderId", "recipientId")
+						`);
 					})
 					.as('last_messages'),
 				function () {
-					this.on('users.id', '=', 'last_messages.senderId').orOn('users.id', '=', 'last_messages.recipientId');
+					this.on(function () {
+						this.on('users.id', '=', 'last_messages.senderId').orOn('users.id', '=', 'last_messages.recipientId');
+					});
 				}
 			)
 			.orderBy('last_messages.created_at', 'desc');
