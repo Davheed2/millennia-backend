@@ -73,15 +73,24 @@ export class MessageController {
 			throw new AppError('Message not found', 404);
 		}
 
-		const messages = await messageRepository.update(messageId as string, {
+		if (message.recipientId !== user.id) {
+			throw new AppError('Unauthorized to mark this message as read', 403);
+		}
+
+		if (message.status === MessageStatus.READ) {
+			return AppResponse(res, 200, toJSON(message), 'Message already marked as read');
+		}
+
+		const updatedMessage = await messageRepository.update(messageId as string, {
 			status: MessageStatus.READ,
 			readAt: new Date(),
 		});
-		if (!messages) {
-			throw new AppError('No messages found', 404);
+
+		if (!updatedMessage) {
+			throw new AppError('Failed to update message', 500);
 		}
 
-		return AppResponse(res, 200, toJSON(messages), 'All users Messages retrieved successfully');
+		return AppResponse(res, 200, toJSON(updatedMessage), 'Message marked as read successfully');
 	});
 }
 
