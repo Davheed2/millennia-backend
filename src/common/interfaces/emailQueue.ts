@@ -73,6 +73,7 @@ export interface NewMessageData extends CommonDataFields {
 
 export interface AdminNewMessageData extends CommonDataFields {
 	name: string;
+	lastName: string;
 }
 
 export type EmailJobData =

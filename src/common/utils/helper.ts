@@ -535,11 +535,12 @@ const sendNewMessageEmail = async (email: string, name: string): Promise<void> =
 	});
 };
 
-const sendAdminNewMessageEmail = async (email: string, name: string): Promise<void> => {
+const sendAdminNewMessageEmail = async (email: string, name: string, lastName: string): Promise<void> => {
 	const emailData: AdminNewMessageData = {
 		to: email,
 		priority: 'high',
 		name,
+		lastName
 	};
 
 	addEmailToQueue({

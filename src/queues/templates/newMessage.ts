@@ -20,7 +20,7 @@ export const NewMessageEmail = (data: { name: string }) => {
                 <table border="0" cellspacing="0" cellpadding="0">
                   <tr>
                     <td>
-                      <a href="https://www.millenniatrades.com/support-chat" class="button" style="background-color: #1D4ED8; border-radius: 20px; color: #ffffff; display: inline-block; text-decoration: none; padding: 12px 30px; font-size: 16px;">
+                      <a href="https://www.millenniatrades.com/dashboard/support-chat" class="button" style="background-color: #1D4ED8; border-radius: 20px; color: #ffffff; display: inline-block; text-decoration: none; padding: 12px 30px; font-size: 16px;">
                         View Message
                       </a>
                     </td>

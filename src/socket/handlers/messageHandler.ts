@@ -36,7 +36,7 @@ export const messageHandler = (io: Server, socket: Socket) => {
 				const admins = await userRepository.findAllAdmins();
 				for (const admin of admins) {
 					if (admin.email && admin.firstName) {
-						await sendAdminNewMessageEmail(admin.email, admin.firstName);
+						await sendAdminNewMessageEmail(admin.email, userRole.firstName, userRole.lastName);
 					}
 				}
 			} else if (userRole?.role === 'admin') {

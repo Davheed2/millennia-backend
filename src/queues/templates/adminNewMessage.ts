@@ -1,10 +1,10 @@
 import { baseTemplate } from './baseTemplate';
 
-export const AdminNewMessageEmail = (data: { name: string }) => {
+export const AdminNewMessageEmail = (data: { name: string, lastName: string }) => {
 	return baseTemplate(
 		`<h2>New Message Received</h2>
     <p>
-      A new message has been sent by <strong>${data.name}</strong> on Millennia Trades.
+      A new message has been sent by <strong>${data.name} ${data.lastName}</strong> on Millennia Trades.
     </p>
 
     <p>
@@ -20,7 +20,7 @@ export const AdminNewMessageEmail = (data: { name: string }) => {
                 <table border="0" cellspacing="0" cellpadding="0">
                   <tr>
                     <td>
-                      <a href="https://www.millenniatrades.com/admin/messages" class="button" style="background-color: #1D4ED8; border-radius: 20px; color: #ffffff; display: inline-block; text-decoration: none; padding: 12px 30px; font-size: 16px;">
+                      <a href="https://www.admin.millenniatrades.com/messages" class="button" style="background-color: #1D4ED8; border-radius: 20px; color: #ffffff; display: inline-block; text-decoration: none; padding: 12px 30px; font-size: 16px;">
                         View in Admin Panel
                       </a>
                     </td>
