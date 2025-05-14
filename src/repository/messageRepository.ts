@@ -49,33 +49,31 @@ class MessageRepository {
 
 	getAllUsersLastMessage = async () => {
 		return await knexDb
-			.select('users.id', 'users.firstName', 'users.lastName', 'users.phone', 'messages.content', 'messages.created_at')
+			.select(
+				'users.senderId',
+				'users.senderFirstName',
+				'users.senderLastName',
+				'users.phone',
+				'users.photo as senderProfileImage',
+				'last_messages.content as lastMessage',
+				'last_messages.created_at'
+			)
 			.from('users')
 			.leftJoin(
-				knexDb
-					.select('*')
-					.from('messages')
-					.whereRaw(
-						`messages.created_at IN (
-						SELECT MAX(created_at)
-						FROM messages m2
-						WHERE m2.senderId = messages.senderId OR m2.recipientId = messages.recipientId
-					)`
-					)
-					.as('messages'),
+				knexDb('messages')
+					.select('id', 'senderId', 'recipientId', 'content', 'created_at')
+					.whereIn('id', function () {
+						this.select(knexDb.raw('MAX(id)'))
+							.from('messages')
+							.groupByRaw('LEAST(senderId, recipientId), GREATEST(senderId, recipientId)');
+					})
+					.as('last_messages'),
 				function () {
-					this.on('users.id', '=', 'messages.senderId').orOn('users.id', '=', 'messages.recipientId');
+					this.on('users.id', '=', 'last_messages.senderId').orOn('users.id', '=', 'last_messages.recipientId');
 				}
 			)
-			.orderBy('messages.created_at', 'desc');
+			.orderBy('last_messages.created_at', 'desc');
 	};
-	//get the last message
-	// getAllMessages = async ():
-
-	// getMessagesByUserId = async (userId: string)
-
-	//delete read messages after 2 days, i think a cron job will do
-	//deleteRead;
 }
 
 export const messageRepository = new MessageRepository();
