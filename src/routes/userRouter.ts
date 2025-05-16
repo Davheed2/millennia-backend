@@ -5,6 +5,8 @@ import express from 'express';
 
 const router = express.Router();
 
+router.get('/company', userController.getCompanyPhone);
+
 router.use(protect);
 
 router.get('/', userController.getProfile);
@@ -15,9 +17,7 @@ router.post('/suspend-user', userController.suspendUser);
 router.post('/make-admin', userController.makeAdmin);
 router.get('/delete-account', userController.deleteAccount);
 
-router.get('/company', userController.getCompanyPhone);
 router.post('/company-phone', userController.updateCompanyPhone);
-
 router.get('/statistics', userController.findStats);
 
 export { router as userRouter };

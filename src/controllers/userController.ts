@@ -215,15 +215,6 @@ export class UserController {
 	});
 
 	getCompanyPhone = catchAsync(async (req: Request, res: Response) => {
-		const { user } = req;
-
-		if (!user) {
-			throw new AppError('Please log in again', 401);
-		}
-		if (user.role === 'user') {
-			throw new AppError('Unauthorized', 403);
-		}
-
 		const phone = await userRepository.getCompanyPhone();
 		if (!phone) {
 			throw new AppError(`Company Phone not found`, 500);
