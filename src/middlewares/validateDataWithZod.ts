@@ -7,7 +7,7 @@ import { catchAsync } from './catchAsyncErrors';
 type MyDataShape = z.infer<typeof mainSchema>;
 
 const methodsToSkipValidation = ['GET'];
-const routesToSkipValidation = ['/api/v1/auth/sign-in', '/api/v1/auth/admin/sign-in', '/api/v1/auth/admin/sign-up'];
+const routesToSkipValidation = ['/api/v1/auth/sign-in', '/api/v1/auth/admin/sign-in']
 
 export const validateDataWithZod = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 	// skip validation for defined methods and routes
