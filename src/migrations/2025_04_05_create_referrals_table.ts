@@ -7,7 +7,7 @@ export async function up(knex: Knex): Promise<void> {
 		table.string('referreeId').notNullable().unique();
 		table.string('referreeFirstName').notNullable();
 		table.string('referreeLastName').notNullable();
-		table.string('hasInvested').defaultTo(true);
+		table.string('hasInvested').defaultTo(false);
 		table.timestamps(true, true);
 	});
 }
