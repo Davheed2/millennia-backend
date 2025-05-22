@@ -65,6 +65,20 @@ export class UserController {
 			throw new AppError('No valid fields to update', 400);
 		}
 
+		if (updateData.email) {
+			const existingUser = await userRepository.findByEmail(updateData.email);
+			if (existingUser && existingUser.id !== user.id) {
+				throw new AppError('Email already in use by another user', 400);
+			}
+		}
+
+		if (updateData.phone) {
+			const existingUser = await userRepository.findByPhone(updateData.phone);
+			if (existingUser && existingUser.id !== user.id) {
+				throw new AppError('Phone number already in use by another user', 400);
+			}
+		}
+
 		const updateProfile = await userRepository.update(user.id, updateData);
 		if (!updateProfile) {
 			throw new AppError('Failed to update profile', 500);

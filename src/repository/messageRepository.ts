@@ -1,5 +1,6 @@
 import { knexDb } from '@/common/config';
 import { IMessage } from '@/common/interfaces';
+import { Knex } from 'knex';
 import { DateTime } from 'luxon';
 // import { DateTime } from 'luxon';
 
@@ -83,31 +84,74 @@ class MessageRepository {
 				'users.lastName as senderLastName',
 				'users.phone',
 				'users.photo as senderProfileImage',
-				'last_messages.content as lastMessage',
-				'last_messages.created_at'
+				'last_messages_base.content as lastMessage',
+				'last_messages_base.created_at'
 			)
 			.whereNot('users.id', currentUserId)
 			.leftJoin(
 				knexDb('messages')
-					.select('id', 'senderId', 'recipientId', 'content', 'created_at')
+					.select(
+						'id',
+						'senderId',
+						'recipientId',
+						'content',
+						'created_at',
+						knexDb.raw(`
+						CASE 
+							WHEN "recipientId" IS NULL THEN "senderId"
+							ELSE LEAST("senderId", "recipientId") 
+						END as user_a
+					`),
+						knexDb.raw(`
+						CASE 
+							WHEN "recipientId" IS NULL THEN NULL
+							ELSE GREATEST("senderId", "recipientId")
+						END as user_b
+					`)
+					)
+					.where(function (this: Knex.QueryBuilder) {
+						this.where('senderId', currentUserId).orWhere('recipientId', currentUserId);
+					})
+					.as('last_messages_base')
 					.whereIn('id', function () {
 						this.select(knexDb.raw('MAX("id")'))
-							.from('messages')
-							.where(function () {
-								this.where('senderId', currentUserId).orWhere('recipientId', currentUserId);
-							}).groupByRaw(`
-							LEAST("senderId", "recipientId"), 
-							GREATEST("senderId", "recipientId")
-						`);
-					})
-					.as('last_messages'),
+							.from(function (this: Knex.QueryBuilder) {
+								this.select(
+									'id',
+									'senderId',
+									'recipientId',
+									knexDb.raw(`
+									CASE 
+										WHEN "recipientId" IS NULL THEN "senderId"
+										ELSE LEAST("senderId", "recipientId") 
+									END as user_a
+								`),
+									knexDb.raw(`
+									CASE 
+										WHEN "recipientId" IS NULL THEN NULL
+										ELSE GREATEST("senderId", "recipientId")
+									END as user_b
+								`)
+								)
+									.from('messages')
+									.where(function (this: Knex.QueryBuilder) {
+										this.where('senderId', currentUserId).orWhere('recipientId', currentUserId);
+									})
+									.as('grouped');
+							})
+							.groupBy(['user_a', 'user_b']);
+					}),
 				function () {
 					this.on(function () {
-						this.on('users.id', '=', 'last_messages.senderId').orOn('users.id', '=', 'last_messages.recipientId');
+						this.on('users.id', '=', 'last_messages_base.senderId').orOn(
+							'users.id',
+							'=',
+							'last_messages_base.recipientId'
+						);
 					});
 				}
 			)
-			.orderBy('last_messages.created_at', 'desc');
+			.orderBy('last_messages_base.created_at', 'desc');
 	};
 }
 

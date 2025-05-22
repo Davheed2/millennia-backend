@@ -15,6 +15,10 @@ class UserRepository {
 		return await knexDb.table('users').where({ email }).first();
 	};
 
+	findByPhone = async (phone: string): Promise<IUser | null> => {
+		return await knexDb.table('users').where({ phone }).first();
+	};
+
 	findByUsername = async (username: string): Promise<IUser | null> => {
 		return await knexDb.table('users').where({ username }).first();
 	};

@@ -13,7 +13,7 @@ export async function runDeleteReadMessagesCron() {
 		console.log(`✅ Deleted ${deletedCount} messages read more than 24 hours ago.`);
 	} catch (error) {
 		console.error('❌ Error during message cleanup cron:', error);
-		process.exit(1);
+		//process.exit(1);
 	}
 }
 

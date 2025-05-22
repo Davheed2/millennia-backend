@@ -59,5 +59,5 @@ export async function runDailyInvestmentCron() {
 
 runDailyInvestmentCron().catch((err) => {
 	console.error('Cron job failed:', err);
-	process.exit(1);
+	//process.exit(1);
 });
