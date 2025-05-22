@@ -89,6 +89,7 @@ class MessageRepository {
 			)
 			.whereNot('users.id', currentUserId)
 			.leftJoin(
+				// Subquery to get the last message per conversation
 				knexDb('messages')
 					.select(
 						'id',
@@ -104,7 +105,7 @@ class MessageRepository {
 					`),
 						knexDb.raw(`
 						CASE 
-							WHEN "recipientId" IS NULL THEN NULL
+							WHEN "recipientId" IS NULL THEN "senderId"
 							ELSE GREATEST("senderId", "recipientId")
 						END as user_b
 					`)
@@ -112,7 +113,6 @@ class MessageRepository {
 					.where(function (this: Knex.QueryBuilder) {
 						this.where('senderId', currentUserId).orWhere('recipientId', currentUserId);
 					})
-					.as('last_messages_base')
 					.whereIn('id', function () {
 						this.select(knexDb.raw('MAX("id")'))
 							.from(function (this: Knex.QueryBuilder) {
@@ -128,7 +128,7 @@ class MessageRepository {
 								`),
 									knexDb.raw(`
 									CASE 
-										WHEN "recipientId" IS NULL THEN NULL
+										WHEN "recipientId" IS NULL THEN "senderId"
 										ELSE GREATEST("senderId", "recipientId")
 									END as user_b
 								`)
@@ -140,7 +140,8 @@ class MessageRepository {
 									.as('grouped');
 							})
 							.groupBy(['user_a', 'user_b']);
-					}),
+					})
+					.as('last_messages_base'),
 				function () {
 					this.on(function () {
 						this.on('users.id', '=', 'last_messages_base.senderId').orOn(
