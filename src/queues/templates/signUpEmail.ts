@@ -5,7 +5,7 @@ export const signUpEmail = (data: { name: string; verificationUrl: string }) => 
 		`<h2>Hi ${data.name},</h2>
 
     <p>
-      Welcome to <strong>Millennia Trades</strong> — we're thrilled to have you onboard!
+      Welcome to <strong>Millennia Trades</strong> we're thrilled to have you onboard!
     </p>
 
     <p>

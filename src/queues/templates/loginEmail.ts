@@ -13,7 +13,7 @@ export const loginEmail = (data: { name: string; time: string }) => {
     </p>
 
     <p>
-      Your account’s safety is our top priority — and we’re always here to help you stay secure.
+      Your account’s safety is our top priority and we’re always here to help you stay secure.
     </p>
 
     <p>Thank you,<br />The Millennia Trades Team</p>`

@@ -146,10 +146,10 @@ export class TransactionController {
 		});
 		if (!update) throw new AppError('Failed to update transaction', 500);
 
-		let userWallet = await walletRepository.findByUserId(user.id);
+		let userWallet = await walletRepository.findByUserId(userId);
 		if (!userWallet || userWallet.length === 0) {
 			userWallet = await walletRepository.create({
-				userId: user.id,
+				userId,
 			});
 		}
 
@@ -197,10 +197,10 @@ export class TransactionController {
 		});
 		if (!update) throw new AppError('Failed to update transaction', 500);
 
-		let userWallet = await walletRepository.findByUserId(user.id);
+		let userWallet = await walletRepository.findByUserId(userId);
 		if (!userWallet || userWallet.length === 0) {
 			userWallet = await walletRepository.create({
-				userId: user.id,
+				userId,
 			});
 		}
 
