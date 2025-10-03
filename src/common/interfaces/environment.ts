@@ -24,6 +24,7 @@ export interface IEnvironment {
 	EMAIL: {
 		GMAIL_USER: string;
 		GMAIL_PASSWORD: string;
+		RESEND_API_KEY: string;
 	};
 	FRONTEND_URL: string;
 	R2: {

@@ -26,6 +26,7 @@ export const ENVIRONMENT: IEnvironment = {
 	EMAIL: {
 		GMAIL_USER: process.env.GMAIL_USER!,
 		GMAIL_PASSWORD: process.env.GMAIL_PASSWORD!,
+		RESEND_API_KEY: process.env.RESEND_API_KEY!,
 	},
 	FRONTEND_URL: process.env.FRONTEND_URL!,
 	R2: {
