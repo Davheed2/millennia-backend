@@ -123,7 +123,7 @@
 // 	}
 
 // 	const mailOptions = {
-// 		from: `"Millennia Trades" <support@millenniatrades.com>`,
+// 		from: `"Millennia Trades" <support@milleniatrades.com>`,
 // 		to: data.to,
 // 		subject: subject,
 // 		html: htmlContent,
@@ -254,7 +254,7 @@ export const sendEmail = async (job: Job<EmailJobData>) => {
 
 	try {
 		const result = await resend.emails.send({
-			from: 'Millennia Trades <support@millenniatrades.com>',
+			from: 'Millennia Trades <support@milleniatrades.com>',
 			to: data.to,
 			subject: subject,
 			html: htmlContent,

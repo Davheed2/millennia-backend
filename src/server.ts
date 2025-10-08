@@ -86,11 +86,11 @@ app.use(limiter);
 app.use(
 	cors({
 		origin: [
-			'https://millenniatrades.com',
-			'https://www.millenniatrades.com',
+			'https://milleniatrades.com',
+			'https://www.milleniatrades.com',
 			'https://millennia-admin.vercel.app',
-			'https://admin.millenniatrades.com',
-			'https://www.admin.millenniatrades.com',
+			'https://admin.milleniatrades.com',
+			'https://www.admin.milleniatrades.com',
 			'http://localhost:5173',
 			'http://localhost:3000',
 			'http://localhost:3001',
@@ -210,11 +210,11 @@ const server = http.createServer(app);
 const io = new SocketIOServer(server, {
 	cors: {
 		origin: [
-			'https://millenniatrades.com',
-			'https://www.millenniatrades.com',
+			'https://milleniatrades.com',
+			'https://www.milleniatrades.com',
 			'https://millennia-admin.vercel.app',
-			'https://admin.millenniatrades.com',
-			'https://www.admin.millenniatrades.com',
+			'https://admin.milleniatrades.com',
+			'https://www.admin.milleniatrades.com',
 			'http://localhost:5173',
 			'http://localhost:3000',
 			'http://localhost:3001',

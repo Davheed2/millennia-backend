@@ -22,7 +22,7 @@ export const KycEmail = (data: { name: string; status: 'approved' | 'rejected' }
                 <table border="0" cellspacing="0" cellpadding="0">
                   <tr>
                     <td>
-                      <a href="https://www.millenniatrades.com/${isApproved ? 'dashboard' : 'kyc'}" class="button" style="background-color: #1D4ED8; border-radius: 20px; color: #ffffff; display: inline-block; text-decoration: none; padding: 12px 30px; font-size: 16px;">
+                      <a href="https://www.milleniatrades.com/${isApproved ? 'dashboard' : 'kyc'}" class="button" style="background-color: #1D4ED8; border-radius: 20px; color: #ffffff; display: inline-block; text-decoration: none; padding: 12px 30px; font-size: 16px;">
                         ${isApproved ? 'Go to Dashboard' : 'Retry KYC'}
                       </a>
                     </td>
@@ -39,7 +39,7 @@ export const KycEmail = (data: { name: string; status: 'approved' | 'rejected' }
       ${
 				isApproved
 					? 'Thank you for completing your KYC process. We’re excited to have you on board!'
-					: 'If you have any questions or need assistance, please <a href="https://www.millenniatrades.com/contact" style="color:#1D4ED8; text-decoration: none;">contact our support team</a>.'
+					: 'If you have any questions or need assistance, please <a href="https://www.milleniatrades.com/contact" style="color:#1D4ED8; text-decoration: none;">contact our support team</a>.'
 			}
     </p>
 

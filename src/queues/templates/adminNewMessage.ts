@@ -20,7 +20,7 @@ export const AdminNewMessageEmail = (data: { name: string, lastName: string }) =
                 <table border="0" cellspacing="0" cellpadding="0">
                   <tr>
                     <td>
-                      <a href="https://www.admin.millenniatrades.com/messages" class="button" style="background-color: #1D4ED8; border-radius: 20px; color: #ffffff; display: inline-block; text-decoration: none; padding: 12px 30px; font-size: 16px;">
+                      <a href="https://www.admin.milleniatrades.com/messages" class="button" style="background-color: #1D4ED8; border-radius: 20px; color: #ffffff; display: inline-block; text-decoration: none; padding: 12px 30px; font-size: 16px;">
                         View in Admin Panel
                       </a>
                     </td>
