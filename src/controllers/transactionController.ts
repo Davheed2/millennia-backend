@@ -14,6 +14,21 @@ import {
 } from '@/common/utils';
 import { catchAsync } from '@/middlewares';
 import { transactionRepository, userRepository, walletRepository } from '@/repository';
+import axios from 'axios';
+
+interface FdicBankData {
+	NAME: string;
+	CERT: string;
+	CITY: string;
+	STNAME: string;
+	ZIP: string;
+	ADDRESS: string;
+	FED_RSSD?: string;
+}
+
+interface FdicApiItem {
+	data: FdicBankData;
+}
 
 export class TransactionController {
 	findByUserId = catchAsync(async (req: Request, res: Response) => {
@@ -284,6 +299,72 @@ export class TransactionController {
 		}
 
 		return AppResponse(res, 200, toJSON(deposits), 'Withdrawals fetched successfully');
+	});
+
+	fetchBanks = catchAsync(async (req: Request, res: Response) => {
+		const { user } = req;
+		const { search } = req.query;
+
+		if (!user) {
+			throw new AppError('Please log in again', 400);
+		}
+
+		try {
+			let url: string;
+
+			if (!search || typeof search !== 'string' || search.trim().length === 0) {
+				// Fetch popular/major banks when no query is provided
+				url = `https://banks.data.fdic.gov/api/institutions?filters=ASSET:[1000000 TO *]&limit=50&format=json&sort_by=ASSET&sort_order=DESC`;
+				console.log('Fetching popular banks - FDIC API URL:', url);
+			} else {
+				// Search for specific banks when query is provided
+				const searchTerm = encodeURIComponent(search.trim());
+				url = `https://banks.data.fdic.gov/api/institutions?filters=NAME:*${searchTerm}*&limit=20&format=json`;
+				console.log('Searching banks - FDIC API URL:', url);
+			}
+
+			const response = await axios.get(url, {
+				headers: {
+					Accept: 'application/json',
+				},
+			});
+
+			console.log('Response from FDIC API:', response.data);
+
+			if (!response.data?.data || !Array.isArray(response.data.data)) {
+				return AppResponse(res, 200, [], 'No banks found');
+			}
+
+			const banks = (response.data.data as FdicApiItem[]).map((item) => ({
+				name: item.data.NAME,
+				cert: item.data.CERT,
+				city: item.data.CITY,
+				state: item.data.STNAME,
+				zip: item.data.ZIP,
+				address: item.data.ADDRESS,
+				routingNumber: item.data.FED_RSSD || null,
+			}));
+
+			console.log(`Found ${banks.length} banks`);
+
+			return AppResponse(res, 200, toJSON(banks), `Found ${banks.length} banks`);
+		} catch (error) {
+			console.error('FDIC API Error:', error);
+
+			if (axios.isAxiosError(error)) {
+				console.error('Error details:', {
+					status: error.response?.status,
+					statusText: error.response?.statusText,
+					data: error.response?.data,
+				});
+
+				if (error.response?.status === 400) {
+					throw new AppError('Invalid search query format', 400);
+				}
+			}
+
+			throw new AppError('Failed to fetch banks. Please try again.', 500);
+		}
 	});
 }
 
