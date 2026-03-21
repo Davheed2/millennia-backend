@@ -137,6 +137,43 @@ class AuthController {
 		return AppResponse(res, 200, toJSON(updatedUser), 'Email verified successfully');
 	});
 
+	resendVerification = catchAsync(async (req: Request, res: Response) => {
+		const { email } = req.body;
+
+		if (!email) {
+			throw new AppError('Email is required', 400);
+		}
+
+		const user = await userRepository.findByEmail(email);
+		if (!user) {
+			throw new AppError('User not found', 404);
+		}
+
+		if (user.isEmailVerified) {
+			throw new AppError('Account is already verified', 400);
+		}
+
+		// Generate new verification token
+		const verificationToken = await generateRandomString();
+		const hashedVerificationToken = createToken(
+			{
+				token: verificationToken,
+			},
+			{ expiresIn: '30d' }
+		);
+
+		const verificationUrl = `${getDomainReferer(req)}/auth?verify=${hashedVerificationToken}`;
+		await sendSignUpEmail(user.email, user.firstName, verificationUrl);
+
+		await userRepository.update(user.id, {
+			verificationToken,
+			verificationTokenExpires: DateTime.now().plus({ days: 30 }).toJSDate(),
+			tokenIsUsed: false,
+		});
+
+		return AppResponse(res, 200, null, `Verification link sent to ${email}`);
+	});
+
 	signIn = catchAsync(async (req: Request, res: Response) => {
 		const { email, password } = req.body;
 
@@ -186,7 +223,15 @@ class AuthController {
 		//login email
 		const loginTime = DateTime.now().toFormat("cccc, LLLL d, yyyy 'at' t");
 		await sendLoginEmail(user.email, user.firstName, loginTime);
-		return AppResponse(res, 200, toJSON([user]), 'User logged in successfully');
+
+		// Return token in response for frontend integration
+		res.status(200).json({
+			status: 'success',
+			data: toJSON([user]),
+			token: accessToken,
+			refreshToken: refreshToken,
+			message: 'User logged in successfully',
+		});
 	});
 
 	adminSignIn = catchAsync(async (req: Request, res: Response) => {

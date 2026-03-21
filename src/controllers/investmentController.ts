@@ -8,7 +8,7 @@ import { TransactionStatus } from '@/common/constants';
 export class InvestmentController {
 	create = catchAsync(async (req: Request, res: Response) => {
 		const { user } = req;
-		const { isRetirement, plan, retirementAccountType, type, symbol, name } = req.body;
+		const { isRetirement, plan, retirementAccountType, type, symbol, name, amount: reqAmount, percentageProfit } = req.body;
 
 		if (!user) throw new AppError('Please log in again', 400);
 		if (!plan) throw new AppError('Plan is required', 400);
@@ -37,49 +37,35 @@ export class InvestmentController {
 			});
 		}
 
-		let amount = 0;
-		let percentage = 0;
-		if (plan === 'basic') {
-			amount = basicPlan;
-			percentage = basicPercentage;
-			if (walletBalance[0].balance < basicPlan) {
-				throw new AppError('Insufficient Balance', 400);
+		let amount = reqAmount || 0;
+		let percentage = percentageProfit || 0;
+
+		// If no specific amount/percentage provided, fallback to legacy plan names
+		if (!reqAmount && !percentageProfit) {
+			if (plan === 'basic') {
+				amount = basicPlan;
+				percentage = basicPercentage;
+			} else if (plan === 'plus') {
+				amount = plusPlan;
+				percentage = plusPercentage;
+			} else if (plan === 'premium') {
+				amount = premiumPlan;
+				percentage = premiumPercentage;
+			} else if (plan === 'gold') {
+				amount = goldPlan;
+				percentage = goldPercentage;
+			} else if (plan === 'platinum') {
+				amount = platinumPlan;
+				percentage = platinumPercentage;
+			} else if (plan === 'diamond') {
+				amount = diamondPlan;
+				percentage = diamondPercentage;
 			}
 		}
-		if (plan === 'plus') {
-			amount = plusPlan;
-			percentage = plusPercentage;
-			if (walletBalance[0].balance < plusPlan) {
-				throw new AppError('Insufficient Balance', 400);
-			}
-		}
-		if (plan === 'premium') {
-			amount = premiumPlan;
-			percentage = premiumPercentage;
-			if (walletBalance[0].balance < premiumPlan) {
-				throw new AppError('Insufficient Balance', 400);
-			}
-		}
-		if (plan === 'gold') {
-			amount = goldPlan;
-			percentage = goldPercentage;
-			if (walletBalance[0].balance < goldPlan) {
-				throw new AppError('Insufficient Balance', 400);
-			}
-		}
-		if (plan === 'platinum') {
-			amount = platinumPlan;
-			percentage = platinumPercentage;
-			if (walletBalance[0].balance < platinumPlan) {
-				throw new AppError('Insufficient Balance', 400);
-			}
-		}
-		if (plan === 'diamond') {
-			amount = diamondPlan;
-			percentage = diamondPercentage;
-			if (walletBalance[0].balance < diamondPlan) {
-				throw new AppError('Insufficient Balance', 400);
-			}
+
+		if (amount <= 0) throw new AppError('Invalid investment amount', 400);
+		if (walletBalance[0].balance < amount) {
+			throw new AppError('Insufficient Balance', 400);
 		}
 
 		const [investment] = await investmentRepository.create({
@@ -95,6 +81,7 @@ export class InvestmentController {
 			percentageProfit: percentage,
 			dailyProfit: 0,
 		});
+
 		if (investment) {
 			const updatedWallet = await walletRepository.update(walletBalance[0].id, {
 				balance: walletBalance[0].balance - amount,
@@ -107,9 +94,8 @@ export class InvestmentController {
 			if (!updatedWallet || !portfolio) {
 				throw new AppError('Failed to update wallet or portfolio balance', 500);
 			}
-		}
-		if (!investment) {
-			throw new AppError('Failed to create investement', 500);
+		} else {
+			throw new AppError('Failed to create investment', 500);
 		}
 
 		AppResponse(res, 201, toJSON([investment]), 'Investment created successfully');

@@ -266,7 +266,7 @@ export class UserController {
 			throw new AppError('Please log in again', 400);
 		}
 		if (user.role === 'user') {
-			throw new AppError('Unauthorized access', 401);
+			return AppResponse(res, 200, toJSON([{}]), 'Stats fetched successfully');
 		}
 
 		const statistics = await userRepository.findStats();

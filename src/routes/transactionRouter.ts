@@ -15,5 +15,6 @@ router.post('/update/withdrawal', transactionController.updateWithdrawal);
 router.get('/deposits', transactionController.fetchDeposits);
 router.get('/withdrawals', transactionController.fetchWithdrawals);
 router.get('/banks', transactionController.fetchBanks);
+router.post('/transfer', transactionController.transferFunds);
 
 export { router as transactionRouter };

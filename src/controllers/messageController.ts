@@ -88,6 +88,31 @@ export class MessageController {
 
 		return AppResponse(res, 200, toJSON(updatedMessage), 'Message marked as read successfully');
 	});
+
+	createMessage = catchAsync(async (req: Request, res: Response) => {
+		const { user } = req;
+		const { content, recipientId } = req.body;
+
+		if (!user) {
+			throw new AppError('Please log in again', 400);
+		}
+		if (!content) {
+			throw new AppError('Content is required', 400);
+		}
+
+		const message = await messageRepository.create({
+			senderId: user.id,
+			recipientId: recipientId || null,
+			content,
+			status: MessageStatus.SENT,
+		});
+
+		if (!message) {
+			throw new AppError('Failed to create message', 500);
+		}
+
+		return AppResponse(res, 201, toJSON(message), 'Message created successfully');
+	});
 }
 
 export const messageController = new MessageController();

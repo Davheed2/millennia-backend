@@ -12,6 +12,7 @@ import {
 	toJSON,
 	uploadPaymentProofFile,
 } from '@/common/utils';
+import { TransactionStatus } from '@/common/constants';
 import { catchAsync } from '@/middlewares';
 import { transactionRepository, userRepository, walletRepository } from '@/repository';
 import axios from 'axios';
@@ -365,6 +366,82 @@ export class TransactionController {
 
 			throw new AppError('Failed to fetch banks. Please try again.', 500);
 		}
+	});
+
+	transferFunds = catchAsync(async (req: Request, res: Response) => {
+		const { user } = req;
+		const { recipient, amount, description } = req.body;
+
+		if (!user) throw new AppError('Please log in again', 400);
+		if (!recipient) throw new AppError('Recipient email or ID is required', 400);
+		if (!amount || Number(amount) <= 0) throw new AppError('Valid amount is required', 400);
+
+		// 1. Find the recipient
+		let recipientUser = await userRepository.findByEmail(recipient);
+		if (!recipientUser) {
+			recipientUser = await userRepository.findById(recipient);
+		}
+
+		if (!recipientUser) {
+			throw new AppError('Recipient not found', 404);
+		}
+
+		if (recipientUser.id === user.id) {
+			throw new AppError('You cannot transfer funds to yourself', 400);
+		}
+
+		// 2. Get sender's wallet and check balance
+		let senderWalletList = await walletRepository.findByUserId(user.id);
+		let senderWallet = senderWalletList[0];
+		if (!senderWallet) {
+			senderWallet = (await walletRepository.create({ userId: user.id }))[0];
+		}
+
+		if (senderWallet.balance < Number(amount)) {
+			throw new AppError('Insufficient balance', 400);
+		}
+
+		// 3. Get recipient's wallet
+		let recipientWalletList = await walletRepository.findByUserId(recipientUser.id);
+		let recipientWallet = recipientWalletList[0];
+		if (!recipientWallet) {
+			recipientWallet = (await walletRepository.create({ userId: recipientUser.id }))[0];
+		}
+
+		// 4. Perform the transfer
+		const reference = referenceGenerator();
+
+		// Update sender wallet
+		await walletRepository.update(senderWallet.id, {
+			balance: senderWallet.balance - Number(amount),
+		});
+
+		// Update recipient wallet
+		await walletRepository.update(recipientWallet.id, {
+			balance: recipientWallet.balance + Number(amount),
+		});
+
+		// Create transaction record for sender
+		await transactionRepository.create({
+			userId: user.id,
+			amount: Number(amount),
+			type: 'transfer',
+			status: TransactionStatus.COMPLETED,
+			description: description || `Transfer to ${recipientUser.firstName} ${recipientUser.lastName}`,
+			reference,
+		});
+
+		// Create transaction record for recipient
+		await transactionRepository.create({
+			userId: recipientUser.id,
+			amount: Number(amount),
+			type: 'transfer',
+			status: TransactionStatus.COMPLETED,
+			description: `Transfer from ${user.firstName} ${user.lastName}`,
+			reference: reference + '-R',
+		});
+
+		return AppResponse(res, 200, null, 'Transfer successful');
 	});
 }
 

@@ -94,6 +94,7 @@ app.use(
 			'http://localhost:5173',
 			'http://localhost:3000',
 			'http://localhost:3001',
+			'http://localhost:4000',
 		],
 		credentials: true,
 	})
@@ -218,6 +219,7 @@ const io = new SocketIOServer(server, {
 			'http://localhost:5173',
 			'http://localhost:3000',
 			'http://localhost:3001',
+			'http://localhost:4000',
 		],
 		credentials: true,
 	},
