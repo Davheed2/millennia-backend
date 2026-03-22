@@ -1,11 +1,11 @@
 import { baseTemplate } from './baseTemplate';
 
 export const loginEmail = (data: { name: string; time: string }) => {
-  return baseTemplate(
-    `<h2>Hello, ${data.name}!</h2>
+	return baseTemplate(
+		`<h2>Hello, ${data.name}!</h2>
 
     <p>
-      We detected a new sign-in to your <strong>Millennia Trades</strong> account on <strong>${data.time}</strong>.
+      We detected a new sign-in to your <strong>Alpsector</strong> account on <strong>${data.time}</strong>.
     </p>
 
     <p>
@@ -16,6 +16,6 @@ export const loginEmail = (data: { name: string; time: string }) => {
       Your account’s safety is our top priority and we’re always here to help you stay secure.
     </p>
 
-    <p>Thank you,<br />The Millennia Trades Team</p>`
-  );
+    <p>Thank you,<br />The Alpsector Team</p>`
+	);
 };

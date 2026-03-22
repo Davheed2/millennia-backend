@@ -1,11 +1,11 @@
 import { baseTemplate } from './baseTemplate';
 
 export const welcomeEmail = (data: { name: string }) => {
-  return baseTemplate(
-    `<h2>Hi ${data.name},</h2>
+	return baseTemplate(
+		`<h2>Hi ${data.name},</h2>
 
     <p>
-      Welcome to <strong>Millennia Trades</strong> — your modern investing platform built for everyone.
+      Welcome to <strong>Alpsector</strong> — your modern investing platform built for everyone.
     </p>
 
     <p>
@@ -13,7 +13,7 @@ export const welcomeEmail = (data: { name: string }) => {
     </p>
 
     <p>
-      <strong>Why Millennia Trades?</strong><br/>
+      <strong>Why Alpsector?</strong><br/>
       📈 Personalized strategies, low fees, and intuitive tools that work for beginners and experts alike.
     </p>
 
@@ -43,7 +43,7 @@ export const welcomeEmail = (data: { name: string }) => {
 
     <p>Want to learn more?</p>
     <p>
-      <a href="https://www.milleniatrades.com/privacy" style="color: #1D4ED8; font-weight: bold;">Check out our privacy policy →</a>
+      <a href="https://www.alpsector.org/privacy" style="color: #1D4ED8; font-weight: bold;">Check out our privacy policy →</a>
     </p>
 
     <hr style="margin: 24px 0;" />
@@ -51,7 +51,7 @@ export const welcomeEmail = (data: { name: string }) => {
     <p>
       We’re excited to help you reach your investing goals.<br />
       <strong>Let’s build your future, together.</strong><br />
-      – The Millennia Trades Team
+      – The Alpsector Team
     </p>`
-  );
+	);
 };

@@ -1,10 +1,10 @@
 import { baseTemplate } from './baseTemplate';
 
 export const forgotPasswordEmail = (data: { name: string; resetLink: string }) => {
-  return baseTemplate(
-    `<h2>Hello, ${data.name}!</h2>
+	return baseTemplate(
+		`<h2>Hello, ${data.name}!</h2>
     <p>
-      We received a request to reset your password for your <strong>Millennia Trades</strong> account.
+      We received a request to reset your password for your <strong>Alpsector</strong> account.
       Click the button below to choose a new password:
     </p>
 
@@ -31,9 +31,9 @@ export const forgotPasswordEmail = (data: { name: string; resetLink: string }) =
     </table>
 
     <p>
-      This link will expire in <strong>15 minutes</strong>. If you didn’t request this password reset, you can safely ignore this message or <a href="https://milleniatrades.com/support" style="color: rgb(112, 232, 204); text-decoration: none;">contact support</a> immediately.
+      This link will expire in <strong>15 minutes</strong>. If you didn’t request this password reset, you can safely ignore this message or <a href="https://alpsector.org/support" style="color: rgb(112, 232, 204); text-decoration: none;">contact support</a> immediately.
     </p>
 
-    <p>Thank you,<br />The Millennia Trades Team</p>`
-  );
+    <p>Thank you,<br />The Alpsector Team</p>`
+	);
 };

@@ -1,10 +1,10 @@
 import { baseTemplate } from './baseTemplate';
 
-export const AdminNewMessageEmail = (data: { name: string, lastName: string }) => {
+export const AdminNewMessageEmail = (data: { name: string; lastName: string }) => {
 	return baseTemplate(
 		`<h2>New Message Received</h2>
     <p>
-      A new message has been sent by <strong>${data.name} ${data.lastName}</strong> on Millennia Trades.
+      A new message has been sent by <strong>${data.name} ${data.lastName}</strong> on Alpsector.
     </p>
 
     <p>
@@ -39,7 +39,7 @@ export const AdminNewMessageEmail = (data: { name: string, lastName: string }) =
 
     <p>
       Thanks,<br />
-      The Millennia Trades System
+      The Alpsector System
     </p>`
 	);
 };

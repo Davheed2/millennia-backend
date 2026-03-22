@@ -5,7 +5,7 @@ export const signUpEmail = (data: { name: string; verificationUrl: string }) => 
 		`<h2>Hi ${data.name},</h2>
 
     <p>
-      Welcome to <strong>Millennia Trades</strong> we're thrilled to have you onboard!
+      Welcome to <strong>Alpsector</strong> we're thrilled to have you onboard!
     </p>
 
     <p>
@@ -43,9 +43,9 @@ export const signUpEmail = (data: { name: string; verificationUrl: string }) => 
     </p>
 
     <p>
-      This link is valid for <strong>30 days</strong>. If you didn't sign up for Millennia Trades, feel free to ignore this email.
+      This link is valid for <strong>30 days</strong>. If you didn't sign up for Alpsector, feel free to ignore this email.
     </p>
 
-    <p>Thanks,<br/>The Millennia Trades Team</p>`
+    <p>Thanks,<br/>The Alpsector Team</p>`
 	);
 };

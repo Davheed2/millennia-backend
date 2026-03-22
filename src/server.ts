@@ -86,8 +86,8 @@ app.use(limiter);
 app.use(
 	cors({
 		origin: [
-			'https://milleniatrades.com',
-			'https://www.milleniatrades.com',
+			'https://alpsector.org',
+			'https://www.alpsector.org',
 			'https://millennia-admin.vercel.app',
 			'https://admin.milleniatrades.com',
 			'https://www.admin.milleniatrades.com',
@@ -211,8 +211,8 @@ const server = http.createServer(app);
 const io = new SocketIOServer(server, {
 	cors: {
 		origin: [
-			'https://milleniatrades.com',
-			'https://www.milleniatrades.com',
+			'https://alpsector.org',
+			'https://www.alpsector.org',
 			'https://millennia-admin.vercel.app',
 			'https://admin.milleniatrades.com',
 			'https://www.admin.milleniatrades.com',

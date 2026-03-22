@@ -114,7 +114,7 @@ export const baseTemplate = (template: string): string => {
             <table class="email-content" cellpadding="0" cellspacing="0">
               <tr>
                 <td class="email-masthead">
-                  <img src="https://res.cloudinary.com/dnhu3eqn5/image/upload/v1746912743/millennnia_i45qza.png" 
+                  <img src="https://res.cloudinary.com/doakjjulz/image/upload/v1774178618/alpsectorlogo_msld5w.png" 
                        alt="100minds logo" 
                        width="100" 
                        height="auto" 
@@ -143,12 +143,12 @@ export const baseTemplate = (template: string): string => {
                     <tr>
                       <td class="content-cell-footer">
                         <p>
-                          This email was sent to you by Millennia Trades. By using our services, you agree to our
+                          This email was sent to you by Alpsector. By using our services, you agree to our
                         </p>
                         <p>
                           <a href="https://helpcenter.com">customer agreements</a>.
                         </p>
-                        <p>&copy; Millennia Trades ${new Date().getFullYear()}. All rights reserved.</p>
+                        <p>&copy; Alpsector ${new Date().getFullYear()}. All rights reserved.</p>
                       </td>
                     </tr>
                   </table>

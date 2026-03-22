@@ -16,7 +16,7 @@ export const resetPasswordEmail = (data: { name: string }) => {
                 <table border="0" cellspacing="0" cellpadding="0">
                   <tr>
                     <td>
-                      <a href="https://www.milleniatrades.com/signin" class="button" style="background-color: #1D4ED8; border-radius: 20px; color: #ffffff; display: inline-block; text-decoration: none; padding: 12px 30px; font-size: 16px;">
+                      <a href="https://www.alpsector.org/signin" class="button" style="background-color: #1D4ED8; border-radius: 20px; color: #ffffff; display: inline-block; text-decoration: none; padding: 12px 30px; font-size: 16px;">
                         Sign In
                       </a>
                     </td>
@@ -30,12 +30,12 @@ export const resetPasswordEmail = (data: { name: string }) => {
     </table>
 
     <p>
-      Didn’t request a password reset? Please <a href="https://www.milleniatrades.com/contact" style="color:#1D4ED8; text-decoration: none;">contact our support team</a> right away to secure your account.
+      Didn’t request a password reset? Please <a href="https://www.alpsector.org/contact" style="color:#1D4ED8; text-decoration: none;">contact our support team</a> right away to secure your account.
     </p>
 
     <p>
       Thanks,<br />
-      The Millennia Trades Team
+      The Alpsector Team
     </p>`
 	);
 };

@@ -61,11 +61,11 @@
 // 	switch (type) {
 // 		case 'signUpEmail':
 // 			htmlContent = signUpEmail(data as SignUpEmailData);
-// 			subject = 'Verify your email to get started with Millennia Trades';
+// 			subject = 'Verify your email to get started with Alpsector';
 // 			break;
 // 		case 'welcomeEmail':
 // 			htmlContent = welcomeEmail(data as WelcomeEmailData);
-// 			subject = 'Welcome to Millennia Trades';
+// 			subject = 'Welcome to Alpsector';
 // 			break;
 // 		case 'loginEmail':
 // 			htmlContent = loginEmail(data as LoginEmailData);
@@ -123,7 +123,7 @@
 // 	}
 
 // 	const mailOptions = {
-// 		from: `"Millennia Trades" <support@milleniatrades.com>`,
+// 		from: `"Alpsector" <support@milleniatrades.com>`,
 // 		to: data.to,
 // 		subject: subject,
 // 		html: htmlContent,
@@ -138,7 +138,6 @@
 // 		logger.error(`Failed to send email to ${data.to}: ${error}`);
 // 	}
 // };
-
 
 import {
 	EmailJobData,
@@ -192,11 +191,11 @@ export const sendEmail = async (job: Job<EmailJobData>) => {
 	switch (type) {
 		case 'signUpEmail':
 			htmlContent = signUpEmail(data as SignUpEmailData);
-			subject = 'Verify your email to get started with Millennia Trades';
+			subject = 'Verify your email to get started with Alpsector';
 			break;
 		case 'welcomeEmail':
 			htmlContent = welcomeEmail(data as WelcomeEmailData);
-			subject = 'Welcome to Millennia Trades';
+			subject = 'Welcome to Alpsector';
 			break;
 		case 'loginEmail':
 			htmlContent = loginEmail(data as LoginEmailData);
@@ -254,7 +253,7 @@ export const sendEmail = async (job: Job<EmailJobData>) => {
 
 	try {
 		const result = await resend.emails.send({
-			from: 'Millennia Trades <support@milleniatrades.com>',
+			from: 'Alpsector <support@milleniatrades.com>',
 			to: data.to,
 			subject: subject,
 			html: htmlContent,
