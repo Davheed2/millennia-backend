@@ -18,7 +18,7 @@ export const knexConfig: Knex.Config = {
 		directory: process.cwd().includes('build') ? './migrations' : './migrations',
 		extension: 'js',
 	},
-	acquireConnectionTimeout: 5000,
+	acquireConnectionTimeout: 20000,
 };
 
 export const knexDb = knex(knexConfig);
