@@ -158,7 +158,7 @@ import {
 } from '@/common/interfaces';
 import { logger } from '@/common/utils';
 import { Resend } from 'resend';
-import { ENVIRONMENT } from 'src/common/config';
+import { ENVIRONMENT } from '@/common/config';
 import {
 	forgotPasswordEmail,
 	loginEmail,
