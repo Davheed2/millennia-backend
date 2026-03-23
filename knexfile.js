@@ -29,7 +29,7 @@ module.exports = {
 			password: process.env.DB_PASSWORD,
 			database: process.env.DB_DATABASE,
 			port: process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : 5432,
-			ssl: { rejectUnauthorized: true },
+			ssl: { rejectUnauthorized: false },
 		},
 		pool: {
 			min: 1,
