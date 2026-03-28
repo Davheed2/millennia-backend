@@ -8,3 +8,4 @@ export * from './transactionRouter';
 export * from './walletRouter';
 export * from './investmentRouter';
 export * from './messageRouter';
+export * from './sysCryptoRouter';

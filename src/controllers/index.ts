@@ -9,3 +9,4 @@ export * from './transactionController';
 export * from './walletController';
 export * from './investmentController';
 export * from './messageController';
+export * from './sysCryptoController';

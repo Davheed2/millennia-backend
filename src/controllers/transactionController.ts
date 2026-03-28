@@ -9,6 +9,7 @@ import {
 	sendProcessingWithdrawalEmail,
 	sendSuccessfulDepositEmail,
 	sendSuccessfulWithdrawalEmail,
+	sendAdminNewDepositEmail,
 	toJSON,
 	uploadPaymentProofFile,
 } from '@/common/utils';
@@ -85,6 +86,15 @@ export class TransactionController {
 		if (!transaction) throw new AppError('Failed to create wallet top up transaction', 500);
 
 		await sendProcessingDepositEmail(user.email, user.firstName, amount, reference);
+
+		// Notify all admins of the new deposit request
+		const admins = await userRepository.findAllAdmins();
+		for (const admin of admins) {
+			if (admin.email) {
+				await sendAdminNewDepositEmail(admin.email, `${user.firstName} ${user.lastName}`, amount, reference);
+			}
+		}
+
 		return AppResponse(res, 200, toJSON(transaction), 'Transaction created successfully');
 	});
 

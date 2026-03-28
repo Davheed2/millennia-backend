@@ -29,7 +29,7 @@ export const welcomeEmail = (data: { name: string }) => {
     </p>
 
     <p>
-      Simple. Smart. Secure. That’s investing the Millennia way.
+      Simple. Smart. Secure. That’s investing the Alpsector way.
     </p>
 
     <hr style="margin: 24px 0;" />

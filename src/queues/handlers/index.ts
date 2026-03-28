@@ -123,7 +123,7 @@
 // 	}
 
 // 	const mailOptions = {
-// 		from: `"Alpsector" <support@milleniatrades.com>`,
+// 		from: `"Alpsector" <support@alpsector.com>`,
 // 		to: data.to,
 // 		subject: subject,
 // 		html: htmlContent,
@@ -155,6 +155,7 @@ import {
 	FailedWithdrawalData,
 	NewMessageData,
 	AdminNewMessageData,
+	AdminNewDepositData,
 } from '@/common/interfaces';
 import { logger } from '@/common/utils';
 import { Resend } from 'resend';
@@ -174,6 +175,7 @@ import {
 	WithdrawalFailedEmail,
 	NewMessageEmail,
 	AdminNewMessageEmail,
+	AdminNewDepositEmail,
 } from '../templates';
 import { Job } from 'bullmq';
 
@@ -247,13 +249,17 @@ export const sendEmail = async (job: Job<EmailJobData>) => {
 			htmlContent = AdminNewMessageEmail(data as AdminNewMessageData);
 			subject = 'New Message Alert';
 			break;
+		case 'adminNewDeposit':
+			htmlContent = AdminNewDepositEmail(data as AdminNewDepositData);
+			subject = 'New Deposit Request';
+			break;
 		default:
 			throw new Error(`No template found for email type: ${type}`);
 	}
 
 	try {
 		const result = await resend.emails.send({
-			from: 'Alpsector <support@milleniatrades.com>',
+			from: 'Alpsector <support@updates.alpsector.com>',
 			to: data.to,
 			subject: subject,
 			html: htmlContent,

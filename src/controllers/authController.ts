@@ -199,9 +199,6 @@ class AuthController {
 			throw new AppError('Invalid credentials', 401);
 		}
 
-		if (!user.isEmailVerified) {
-			throw new AppError('Your account is not yet verified', 401);
-		}
 		if (user.isSuspended) {
 			throw new AppError('Your account is currently suspended', 401);
 		}
@@ -262,9 +259,6 @@ class AuthController {
 			throw new AppError('Invalid credentials', 401);
 		}
 
-		if (!user.isEmailVerified) {
-			throw new AppError('Your account is not yet verified', 401);
-		}
 		if (user.isSuspended) {
 			throw new AppError('Your account is currently suspended', 401);
 		}

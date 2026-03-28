@@ -26,6 +26,7 @@ import {
 	walletRouter,
 	investementRouter,
 	messageRouter,
+	sysCryptoRouter,
 } from '@/routes';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
@@ -89,8 +90,8 @@ app.use(
 			'https://alpsector.com',
 			'https://www.alpsector.com',
 			'https://millennia-admin.vercel.app',
-			'https://admin.milleniatrades.com',
-			'https://www.admin.milleniatrades.com',
+			'https://admin.alpsector.com',
+			'https://www.admin.alpsector.com',
 			'http://localhost:5173',
 			'http://localhost:3000',
 			'http://localhost:3001',
@@ -189,6 +190,7 @@ app.use('/api/v1/transaction', transactionRouter);
 app.use('/api/v1/wallet', walletRouter);
 app.use('/api/v1/investment', investementRouter);
 app.use('/api/v1/message', messageRouter);
+app.use('/api/v1/crypto', sysCryptoRouter);
 
 app.all('/{*splat}', async (req, res) => {
 	logger.error('route not found ' + new Date(Date.now()) + ' ' + req.originalUrl);
@@ -214,8 +216,8 @@ const io = new SocketIOServer(server, {
 			'https://alpsector.org',
 			'https://www.alpsector.org',
 			'https://millennia-admin.vercel.app',
-			'https://admin.milleniatrades.com',
-			'https://www.admin.milleniatrades.com',
+			'https://admin.alpsector.com',
+			'https://www.admin.alpsector.com',
 			'http://localhost:5173',
 			'http://localhost:3000',
 			'http://localhost:3001',
