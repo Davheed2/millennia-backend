@@ -86,8 +86,8 @@ app.use(limiter);
 app.use(
 	cors({
 		origin: [
-			'https://alpsector.org',
-			'https://www.alpsector.org',
+			'https://alpsector.com',
+			'https://www.alpsector.com',
 			'https://millennia-admin.vercel.app',
 			'https://admin.milleniatrades.com',
 			'https://www.admin.milleniatrades.com',
