@@ -23,10 +23,10 @@ if (connection) {
 const emailQueue = new Queue<EmailJobData>('emailQueue', {
 	connection,
 	defaultJobOptions: {
-		attempts: 3,
+		attempts: 5,
 		backoff: {
 			type: 'exponential',
-			delay: 1000,
+			delay: 5000,
 		},
 	},
 });
