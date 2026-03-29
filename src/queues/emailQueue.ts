@@ -5,15 +5,16 @@ import { Job, Queue, QueueEvents, Worker, WorkerOptions } from 'bullmq';
 import { sendEmail } from './handlers';
 import IORedis from 'ioredis';
 
-const connection = new IORedis({
-	port: ENVIRONMENT.REDIS.PORT,
-	host: ENVIRONMENT.REDIS.URL,
-	password: ENVIRONMENT.REDIS.PASSWORD,
-	maxRetriesPerRequest: null,
-	//enableOfflineQueue: false,
-	offlineQueue: false,
-	//tls: { rejectUnauthorized: false },
-});
+const connection = ENVIRONMENT.REDIS.URL.startsWith('rediss://')
+	? new IORedis(ENVIRONMENT.REDIS.URL, { maxRetriesPerRequest: null, offlineQueue: false })
+	: new IORedis({
+			port: ENVIRONMENT.REDIS.PORT,
+			host: ENVIRONMENT.REDIS.URL,
+			password: ENVIRONMENT.REDIS.PASSWORD,
+			maxRetriesPerRequest: null,
+			//enableOfflineQueue: false,
+			offlineQueue: false,
+		});
 
 if (connection) {
 	console.log('Connected to queue redis cluster');

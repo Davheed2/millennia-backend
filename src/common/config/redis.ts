@@ -4,14 +4,20 @@ import { ENVIRONMENT } from './environment';
 let redisClient: IORedis;
 export const connectRedis = async (): Promise<void> => {
 	try {
-		redisClient = new IORedis({
-			port: ENVIRONMENT.REDIS.PORT,
-			host: ENVIRONMENT.REDIS.URL,
-			password: ENVIRONMENT.REDIS.PASSWORD,
-			maxRetriesPerRequest: null,
-			enableOfflineQueue: false,
-			offlineQueue: false,
-		});
+		redisClient = ENVIRONMENT.REDIS.URL.startsWith('rediss://')
+			? new IORedis(ENVIRONMENT.REDIS.URL, {
+					maxRetriesPerRequest: null,
+					enableOfflineQueue: false,
+					offlineQueue: false,
+				})
+			: new IORedis({
+					port: ENVIRONMENT.REDIS.PORT,
+					host: ENVIRONMENT.REDIS.URL,
+					password: ENVIRONMENT.REDIS.PASSWORD,
+					maxRetriesPerRequest: null,
+					enableOfflineQueue: false,
+					offlineQueue: false,
+				});
 
 		redisClient.on('connect', () => {
 			console.log('Redis cluster connected');
