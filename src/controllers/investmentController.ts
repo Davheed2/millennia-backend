@@ -40,27 +40,30 @@ export class InvestmentController {
 		let amount = reqAmount || 0;
 		let percentage = percentageProfit || 0;
 
-		// If no specific amount/percentage provided, fallback to legacy plan names
+		// If no specific amount/percentage provided, fallback to plan names
 		if (!reqAmount && !percentageProfit) {
-			if (plan === 'basic') {
-				amount = basicPlan;
-				percentage = basicPercentage;
-			} else if (plan === 'plus') {
-				amount = plusPlan;
-				percentage = plusPercentage;
-			} else if (plan === 'premium') {
-				amount = premiumPlan;
-				percentage = premiumPercentage;
-			} else if (plan === 'gold') {
-				amount = goldPlan;
-				percentage = goldPercentage;
-			} else if (plan === 'platinum') {
-				amount = platinumPlan;
-				percentage = platinumPercentage;
-			} else if (plan === 'diamond') {
-				amount = diamondPlan;
-				percentage = diamondPercentage;
+			const planLower = plan.toLowerCase();
+			if (planLower.includes('basic') || planLower.includes('starter') || planLower.includes('foundation') || planLower.includes('starter') || planLower.includes('entry') || planLower.includes('starter')) {
+				amount = isRetirement ? 5000 : 350;
+				percentage = 5.2;
+			} else if (planLower.includes('plus') || planLower.includes('explore') || planLower.includes('satellite') || planLower.includes('basket') || planLower.includes('ladder') || planLower.includes('diversified portfolio') || planLower.includes('farm index')) {
+				amount = isRetirement ? 10000 : 1000;
+				percentage = 7.8;
+			} else if (planLower.includes('premium') || planLower.includes('gold') || planLower.includes('platinum') || planLower.includes('diamond') || planLower.includes('secure') || planLower.includes('income') || planLower.includes('futures') || planLower.includes('barbell') || planLower.includes('ownership') || planLower.includes('farmland')) {
+				amount = isRetirement ? 25000 : 5000;
+				percentage = 12.4;
+			} else if (planLower.includes('trial')) {
+				amount = 100;
+				percentage = 5.2;
 			}
+		}
+		
+		// Ensure percentage is set if it's still 0 but we have a plan
+		if (percentage === 0) {
+			const planLower = plan.toLowerCase();
+			if (planLower.includes('starter') || planLower.includes('foundation') || planLower.includes('entry') || planLower.includes('trial')) percentage = 5.2;
+			else if (planLower.includes('explore') || planLower.includes('satellite') || planLower.includes('basket') || planLower.includes('ladder') || planLower.includes('diversified portfolio') || planLower.includes('farm index')) percentage = 7.8;
+			else if (planLower.includes('secure') || planLower.includes('income') || planLower.includes('futures') || planLower.includes('barbell') || planLower.includes('ownership') || planLower.includes('farmland')) percentage = 12.4;
 		}
 
 		if (amount <= 0) throw new AppError('Invalid investment amount', 400);

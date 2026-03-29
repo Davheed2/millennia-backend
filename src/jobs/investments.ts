@@ -14,30 +14,35 @@ export async function runDailyInvestmentCron() {
 	const investments = await knexDb('investments').where({ isDeleted: false, isSwitchedOff: false });
 
 	for (const investment of investments) {
-		const { userId, plan } = investment;
+		const { userId, plan, amount, percentageProfit } = investment;
 		let profit = 0;
 
-		switch (plan) {
-			case 'basic':
-				profit = 148; // fixed daily
-				break;
-			case 'plus':
-				profit = getFluctuatingProfit(443, 300, 450); // fluctuating daily
-				break;
-			case 'premium':
-				profit = 1400; // fixed daily
-				break;
-			case 'gold':
-				profit = getFluctuatingProfit(833, 700, 850); // Fluctuates
-				break;
-			case 'platinum':
-				profit = getFluctuatingProfit(2500, 2000, 2600); // Fluctuates
-				break;
-			case 'diamond':
-				profit = getFluctuatingProfit(5500, 5000, 5800); // Fluctuates
-				break;
-			default:
-				continue;
+		if (percentageProfit && percentageProfit > 0) {
+			const dailyBase = Number(amount) * (Number(percentageProfit) / 100);
+			profit = getFluctuatingProfit(dailyBase, dailyBase * 0.9, dailyBase * 1.1);
+		} else {
+			switch (plan) {
+				case 'basic':
+					profit = 148;
+					break;
+				case 'plus':
+					profit = getFluctuatingProfit(443, 300, 450);
+					break;
+				case 'premium':
+					profit = 1400;
+					break;
+				case 'gold':
+					profit = getFluctuatingProfit(833, 700, 850);
+					break;
+				case 'platinum':
+					profit = getFluctuatingProfit(2500, 2000, 2600);
+					break;
+				case 'diamond':
+					profit = getFluctuatingProfit(5500, 5000, 5800);
+					break;
+				default:
+					continue;
+			}
 		}
 
 		// Step 3: Add profit to user's dailyProfitChange and wallet portfolioBalance
