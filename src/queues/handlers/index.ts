@@ -182,6 +182,8 @@ import { Job } from 'bullmq';
 // Initialize Resend with your API key
 const resend = new Resend(ENVIRONMENT.EMAIL.RESEND_API_KEY);
 
+const EMAIL_TIMEOUT = 30000; // 30 seconds
+
 export const sendEmail = async (job: Job<EmailJobData>) => {
 	const { type, data } = job.data;
 
@@ -258,17 +260,32 @@ export const sendEmail = async (job: Job<EmailJobData>) => {
 	}
 
 	try {
-		const result = await resend.emails.send({
-			from: 'Alpsector <support@updates.alpsector.com>',
-			to: data.to,
-			subject: subject,
-			html: htmlContent,
-		});
+		const controller = new AbortController();
+		const timeoutId = setTimeout(() => controller.abort(), EMAIL_TIMEOUT);
+
+		const result = await Promise.race([
+			resend.emails.send({
+				from: 'Alpsector <support@updates.alpsector.com>',
+				to: data.to,
+				subject: subject,
+				html: htmlContent,
+			}),
+			new Promise((_, reject) => setTimeout(() => reject(new Error('EMAIL_TIMEOUT')), EMAIL_TIMEOUT)),
+		]);
+
+		clearTimeout(timeoutId);
 
 		console.log(result);
 		logger.info(`Email successfully sent to ${data.to}`);
 	} catch (error) {
 		console.error(error);
-		logger.error(`Failed to send email to ${data.to}: ${error}`);
+
+		if ((error as Error).message.includes('EMAIL_TIMEOUT')) {
+			logger.error(`Email connection failed (retryable): ${(error as Error).message}`);
+			throw new Error('EMAIL_CONNECTION_FAILED');
+		}
+
+		logger.error(`Failed to send email to ${data.to}: ${(error as Error).message}`);
+		throw error;
 	}
 };
