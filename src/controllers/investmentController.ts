@@ -146,6 +146,92 @@ export class InvestmentController {
 
 		return AppResponse(res, 200, toJSON(investment), 'Investment fetched successfully');
 	});
+
+	withdrawProfit = catchAsync(async (req: Request, res: Response) => {
+		const { user } = req;
+		const { investmentId } = req.body;
+
+		if (!user) throw new AppError('Please log in again', 400);
+		if (!investmentId) throw new AppError('Investment ID is required', 400);
+
+		const investments = await investmentRepository.findById(investmentId);
+		const investment = investments[0];
+		if (!investment || investment.userId !== user.id) {
+			throw new AppError('Investment not found', 404);
+		}
+
+		const profit = Number(investment.dailyProfit) || 0;
+		if (profit <= 0) throw new AppError('No profit to withdraw', 400);
+
+		const walletArr = await walletRepository.findByUserId(user.id);
+		const userWallet = walletArr[0];
+
+		// Update wallet balance
+		await walletRepository.update(userWallet.id, {
+			balance: Number(userWallet.balance) + profit,
+		});
+
+		// Reset investment profit
+		await investmentRepository.update(investmentId, {
+			dailyProfit: 0,
+		});
+
+		// Log transaction
+		await Transaction.add({
+			userId: user.id,
+			amount: profit,
+			type: 'Profit',
+			description: `Profit withdrawal from ${investment.name}`,
+			reference: referenceGenerator(),
+			status: TransactionStatus.COMPLETED,
+		});
+
+		return AppResponse(res, 200, null, 'Profit withdrawn successfully');
+	});
+
+	closePosition = catchAsync(async (req: Request, res: Response) => {
+		const { user } = req;
+		const { investmentId } = req.body;
+
+		if (!user) throw new AppError('Please log in again', 400);
+		if (!investmentId) throw new AppError('Investment ID is required', 400);
+
+		const investments = await investmentRepository.findById(investmentId);
+		const investment = investments[0];
+		if (!investment || investment.userId !== user.id) {
+			throw new AppError('Investment not found', 404);
+		}
+
+		const profit = Number(investment.dailyProfit) || 0;
+		const initialAmount = Number(investment.amount) || 0;
+		const totalToReturn = initialAmount + profit;
+
+		const walletArr = await walletRepository.findByUserId(user.id);
+		const userWallet = walletArr[0];
+
+		// Update wallet: add total amount back, subtract from portfolio
+		await walletRepository.update(userWallet.id, {
+			balance: Number(userWallet.balance) + totalToReturn,
+			portfolioBalance: Math.max(0, Number(userWallet.portfolioBalance) - initialAmount),
+		});
+
+		// Mark investment as deleted
+		await investmentRepository.update(investmentId, {
+			isDeleted: true,
+		});
+
+		// Log transaction
+		await Transaction.add({
+			userId: user.id,
+			amount: totalToReturn,
+			type: 'Investment Closure',
+			description: `Closed position in ${investment.name}`,
+			reference: referenceGenerator(),
+			status: TransactionStatus.COMPLETED,
+		});
+
+		return AppResponse(res, 200, null, 'Position closed successfully');
+	});
 }
 
 export const investmentController = new InvestmentController();

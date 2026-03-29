@@ -266,7 +266,8 @@ export class UserController {
 			throw new AppError('Please log in again', 400);
 		}
 		if (user.role === 'user') {
-			return AppResponse(res, 200, toJSON([{}]), 'Stats fetched successfully');
+			const userStatistics = await userRepository.findUserStats(user.id);
+			return AppResponse(res, 200, toJSON([userStatistics]), 'User statistics fetched successfully');
 		}
 
 		const statistics = await userRepository.findStats();

@@ -15,7 +15,7 @@ export interface IInvestment {
 	isRetirement: boolean;
 	isSwitchedOff: boolean;
 	percentageProfit: number;
-    isDeleted: false;
+    isDeleted: boolean;
 	created_at?: Date;
 	updated_at?: Date;
 }

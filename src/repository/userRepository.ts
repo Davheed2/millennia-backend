@@ -1,5 +1,5 @@
 import { knexDb } from '@/common/config';
-import { IUser, Statistics } from '@/common/interfaces';
+import { IUser, Statistics, UserStatistics } from '@/common/interfaces';
 import { DateTime } from 'luxon';
 
 class UserRepository {
@@ -125,6 +125,57 @@ class UserRepository {
 			totalDeposits: Number(totalDeposits?.total) || 0,
 			totalWithdrawals: Number(totalWithdrawals?.total) || 0,
 			totalKyc: Number(totalKyc?.count) || 0,
+		};
+	};
+
+	findUserStats = async (userId: string): Promise<UserStatistics> => {
+		const totalInvested = await knexDb('investments')
+			.where({ userId, isDeleted: false })
+			.sum('amount as total')
+			.first();
+
+		const activeInvestments = await knexDb('investments')
+			.where({ userId, isDeleted: false, isSwitchedOff: false })
+			.count('* as count')
+			.first();
+
+		const completedInvestments = await knexDb('investments')
+			.where({ userId, isDeleted: false, isSwitchedOff: true })
+			.count('* as count')
+			.first();
+
+		const totalDeposits = await knexDb('transactions')
+			.where({ userId, type: 'Deposit', status: 'completed' })
+			.sum('amount as total')
+			.first();
+
+		const pendingDeposits = await knexDb('transactions')
+			.where({ userId, type: 'Deposit', status: 'pending' })
+			.sum('amount as total')
+			.first();
+
+		const totalWithdrawals = await knexDb('transactions')
+			.where({ userId, type: 'withdrawal', status: 'completed' })
+			.sum('amount as total')
+			.first();
+
+		const pendingWithdrawals = await knexDb('transactions')
+			.where({ userId, type: 'withdrawal', status: 'pending' })
+			.sum('amount as total')
+			.first();
+
+		const userProfile = await this.findById(userId);
+
+		return {
+			totalInvested: Number(totalInvested?.total) || 0,
+			totalProfit: Number(userProfile?.totalProfit) || 0,
+			activeInvestments: Number(activeInvestments?.count) || 0,
+			completedInvestments: Number(completedInvestments?.count) || 0,
+			roi: Number(userProfile?.dailyProfitChange) || 0,
+			totalDeposits: Number(totalDeposits?.total) || 0,
+			totalWithdrawals: Number(totalWithdrawals?.total) || 0,
+			pendingDeposits: Number(pendingDeposits?.total) || 0,
+			pendingWithdrawals: Number(pendingWithdrawals?.total) || 0,
 		};
 	};
 
