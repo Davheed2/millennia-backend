@@ -19,7 +19,7 @@ export const DepositProcessingEmail = (data: { name: string; amount: number; ref
           <table class="body-action" align="center" width="100%" cellpadding="0" cellspacing="0" style="margin: 25px 0;">
             <tr>
               <td align="center">
-                <a href="https://www.alpsector.org/dashboard" class="button" style="background-color: #1D4ED8; border-radius: 20px; color: #ffffff; display: inline-block; text-decoration: none; padding: 14px 40px; font-weight: bold; font-size: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <a href="https://www.alpsector.com/dashboard" class="button" style="background-color: #1D4ED8; border-radius: 20px; color: #ffffff; display: inline-block; text-decoration: none; padding: 14px 40px; font-weight: bold; font-size: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                   View Dashboard
                 </a>
               </td>
@@ -27,7 +27,7 @@ export const DepositProcessingEmail = (data: { name: string; amount: number; ref
           </table>
 
           <p style="margin: 0 0 20px;">
-            You’ll be notified once your deposit is fully processed and credited to your wallet. If you have any questions, please visit our <a href="https://www.alpsector.org/contact" style="color: #3B82F6; text-decoration: none; font-weight: 500;">Support Center</a>.
+            You’ll be notified once your deposit is fully processed and credited to your wallet. If you have any questions, please visit our <a href="https://www.alpsector.com/contact" style="color: #3B82F6; text-decoration: none; font-weight: 500;">Support Center</a>.
           </p>
 
           <p style="margin: 0; font-weight: 500;">

@@ -43,7 +43,7 @@ export const welcomeEmail = (data: { name: string }) => {
 
     <p>Want to learn more?</p>
     <p>
-      <a href="https://www.alpsector.org/privacy" style="color: #1D4ED8; font-weight: bold;">Check out our privacy policy →</a>
+      <a href="https://www.alpsector.com/privacy" style="color: #1D4ED8; font-weight: bold;">Check out our privacy policy →</a>
     </p>
 
     <hr style="margin: 24px 0;" />

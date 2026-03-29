@@ -31,7 +31,7 @@ export const forgotPasswordEmail = (data: { name: string; resetLink: string }) =
     </table>
 
     <p>
-      This link will expire in <strong>15 minutes</strong>. If you didn’t request this password reset, you can safely ignore this message or <a href="https://alpsector.org/support" style="color: rgb(112, 232, 204); text-decoration: none;">contact support</a> immediately.
+      This link will expire in <strong>15 minutes</strong>. If you didn’t request this password reset, you can safely ignore this message or <a href="https://alpsector.com/support" style="color: rgb(112, 232, 204); text-decoration: none;">contact support</a> immediately.
     </p>
 
     <p>Thank you,<br />The Alpsector Team</p>`

@@ -20,7 +20,7 @@ export const NewMessageEmail = (data: { name: string }) => {
                 <table border="0" cellspacing="0" cellpadding="0">
                   <tr>
                     <td>
-                      <a href="https://www.alpsector.org/dashboard/support-chat" class="button" style="background-color: #1D4ED8; border-radius: 20px; color: #ffffff; display: inline-block; text-decoration: none; padding: 12px 30px; font-size: 16px;">
+                      <a href="https://www.alpsector.com/dashboard/support-chat" class="button" style="background-color: #1D4ED8; border-radius: 20px; color: #ffffff; display: inline-block; text-decoration: none; padding: 12px 30px; font-size: 16px;">
                         View Message
                       </a>
                     </td>
@@ -34,7 +34,7 @@ export const NewMessageEmail = (data: { name: string }) => {
     </table>
 
     <p>
-      If you have any questions or need help, feel free to <a href="https://www.alpsector.org/contact" style="color:#1D4ED8; text-decoration: none;">contact our support team</a>.
+      If you have any questions or need help, feel free to <a href="https://www.alpsector.com/contact" style="color:#1D4ED8; text-decoration: none;">contact our support team</a>.
     </p>
 
     <p>

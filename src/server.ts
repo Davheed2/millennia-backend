@@ -213,8 +213,8 @@ const server = http.createServer(app);
 const io = new SocketIOServer(server, {
 	cors: {
 		origin: [
-			'https://alpsector.org',
-			'https://www.alpsector.org',
+			'https://alpsector.com',
+			'https://www.alpsector.com',
 			'https://millennia-admin.vercel.app',
 			'https://admin.alpsector.com',
 			'https://www.admin.alpsector.com',
