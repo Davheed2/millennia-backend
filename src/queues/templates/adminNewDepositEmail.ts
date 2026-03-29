@@ -20,7 +20,7 @@ export const AdminNewDepositEmail = (data: { userName: string; amount: number; r
           <table class="body-action" align="center" width="100%" cellpadding="0" cellspacing="0" style="margin: 25px 0;">
             <tr>
               <td align="center">
-                <a href="https://admin.milleniatrades.com/deposits" class="button" style="background-color: #10B981; border-radius: 20px; color: #ffffff; display: inline-block; text-decoration: none; padding: 14px 40px; font-weight: bold; font-size: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <a href="https://admin.alpsector.com/deposits" class="button" style="background-color: #10B981; border-radius: 20px; color: #ffffff; display: inline-block; text-decoration: none; padding: 14px 40px; font-weight: bold; font-size: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                   Review Deposit
                 </a>
               </td>

@@ -8,7 +8,16 @@ import { TransactionStatus } from '@/common/constants';
 export class InvestmentController {
 	create = catchAsync(async (req: Request, res: Response) => {
 		const { user } = req;
-		const { isRetirement, plan, retirementAccountType, type, symbol, name, amount: reqAmount, percentageProfit } = req.body;
+		const {
+			isRetirement,
+			plan,
+			retirementAccountType,
+			type,
+			symbol,
+			name,
+			amount: reqAmount,
+			percentageProfit,
+		} = req.body;
 
 		if (!user) throw new AppError('Please log in again', 400);
 		if (!plan) throw new AppError('Plan is required', 400);
@@ -43,13 +52,39 @@ export class InvestmentController {
 		// If no specific amount/percentage provided, fallback to plan names
 		if (!reqAmount && !percentageProfit) {
 			const planLower = plan.toLowerCase();
-			if (planLower.includes('basic') || planLower.includes('starter') || planLower.includes('foundation') || planLower.includes('starter') || planLower.includes('entry') || planLower.includes('starter')) {
+			if (
+				planLower.includes('basic') ||
+				planLower.includes('starter') ||
+				planLower.includes('foundation') ||
+				planLower.includes('starter') ||
+				planLower.includes('entry') ||
+				planLower.includes('starter')
+			) {
 				amount = isRetirement ? 5000 : 350;
 				percentage = 5.2;
-			} else if (planLower.includes('plus') || planLower.includes('explore') || planLower.includes('satellite') || planLower.includes('basket') || planLower.includes('ladder') || planLower.includes('diversified portfolio') || planLower.includes('farm index')) {
+			} else if (
+				planLower.includes('plus') ||
+				planLower.includes('explore') ||
+				planLower.includes('satellite') ||
+				planLower.includes('basket') ||
+				planLower.includes('ladder') ||
+				planLower.includes('diversified portfolio') ||
+				planLower.includes('farm index')
+			) {
 				amount = isRetirement ? 10000 : 1000;
 				percentage = 7.8;
-			} else if (planLower.includes('premium') || planLower.includes('gold') || planLower.includes('platinum') || planLower.includes('diamond') || planLower.includes('secure') || planLower.includes('income') || planLower.includes('futures') || planLower.includes('barbell') || planLower.includes('ownership') || planLower.includes('farmland')) {
+			} else if (
+				planLower.includes('premium') ||
+				planLower.includes('gold') ||
+				planLower.includes('platinum') ||
+				planLower.includes('diamond') ||
+				planLower.includes('secure') ||
+				planLower.includes('income') ||
+				planLower.includes('futures') ||
+				planLower.includes('barbell') ||
+				planLower.includes('ownership') ||
+				planLower.includes('farmland')
+			) {
 				amount = isRetirement ? 25000 : 5000;
 				percentage = 12.4;
 			} else if (planLower.includes('trial')) {
@@ -57,13 +92,35 @@ export class InvestmentController {
 				percentage = 5.2;
 			}
 		}
-		
+
 		// Ensure percentage is set if it's still 0 but we have a plan
 		if (percentage === 0) {
 			const planLower = plan.toLowerCase();
-			if (planLower.includes('starter') || planLower.includes('foundation') || planLower.includes('entry') || planLower.includes('trial')) percentage = 5.2;
-			else if (planLower.includes('explore') || planLower.includes('satellite') || planLower.includes('basket') || planLower.includes('ladder') || planLower.includes('diversified portfolio') || planLower.includes('farm index')) percentage = 7.8;
-			else if (planLower.includes('secure') || planLower.includes('income') || planLower.includes('futures') || planLower.includes('barbell') || planLower.includes('ownership') || planLower.includes('farmland')) percentage = 12.4;
+			if (
+				planLower.includes('starter') ||
+				planLower.includes('foundation') ||
+				planLower.includes('entry') ||
+				planLower.includes('trial')
+			)
+				percentage = 5.2;
+			else if (
+				planLower.includes('explore') ||
+				planLower.includes('satellite') ||
+				planLower.includes('basket') ||
+				planLower.includes('ladder') ||
+				planLower.includes('diversified portfolio') ||
+				planLower.includes('farm index')
+			)
+				percentage = 7.8;
+			else if (
+				planLower.includes('secure') ||
+				planLower.includes('income') ||
+				planLower.includes('futures') ||
+				planLower.includes('barbell') ||
+				planLower.includes('ownership') ||
+				planLower.includes('farmland')
+			)
+				percentage = 12.4;
 		}
 
 		if (amount <= 0) throw new AppError('Invalid investment amount', 400);
@@ -114,7 +171,7 @@ export class InvestmentController {
 					type: 'Investment',
 					description: `${plan} plan investment in ${symbol}`,
 					reference,
-					status: TransactionStatus.COMPLETED
+					status: TransactionStatus.COMPLETED,
 				});
 			} catch (error) {
 				logger.error(error);
@@ -157,8 +214,7 @@ export class InvestmentController {
 		if (!user) throw new AppError('Please log in again', 400);
 		if (!investmentId) throw new AppError('Investment ID is required', 400);
 
-		const investments = await investmentRepository.findById(investmentId);
-		const investment = investments[0];
+		const investment = await investmentRepository.findOneById(investmentId);
 		if (!investment || investment.userId !== user.id) {
 			throw new AppError('Investment not found', 404);
 		}
@@ -199,8 +255,7 @@ export class InvestmentController {
 		if (!user) throw new AppError('Please log in again', 400);
 		if (!investmentId) throw new AppError('Investment ID is required', 400);
 
-		const investments = await investmentRepository.findById(investmentId);
-		const investment = investments[0];
+		const investment = await investmentRepository.findOneById(investmentId);
 		if (!investment || investment.userId !== user.id) {
 			throw new AppError('Investment not found', 404);
 		}

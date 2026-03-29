@@ -48,6 +48,7 @@ export const mainSchema = z.object({
 	status: z.string(),
 	makeAdmin: z.boolean(),
 	userId: z.string().uuid(),
+	investmentId: z.string().uuid(),
 	transactionId: z.string().uuid(),
 	wishlistId: z.string().uuid(),
 	symbol: z.string().min(3),

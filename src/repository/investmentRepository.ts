@@ -7,6 +7,10 @@ class InvestmentRepository {
 		return await knexDb.table('investments').insert(payload).returning('*');
 	};
 
+	findOneById = async (id: string) => {
+		return await knexDb.table('investments').where({ id, isDeleted: false }).first();
+	};
+
 	findById = async (
 		id: string
 	): Promise<

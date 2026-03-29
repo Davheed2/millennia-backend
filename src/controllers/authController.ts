@@ -205,6 +205,9 @@ class AuthController {
 		if (user.isDeleted) {
 			throw new AppError('Your account is currently deleted', 401);
 		}
+		if (!user.isEmailVerified) {
+			throw new AppError('Please verify your email address before logging in', 403);
+		}
 
 		const accessToken = generateAccessToken(user.id);
 		const refreshToken = generateRefreshToken(user.id);
@@ -264,6 +267,9 @@ class AuthController {
 		}
 		if (user.isDeleted) {
 			throw new AppError('Your account is currently deleted', 401);
+		}
+		if (!user.isEmailVerified) {
+			throw new AppError('Please verify your email address before logging in', 403);
 		}
 
 		const accessToken = generateAccessToken(user.id);
