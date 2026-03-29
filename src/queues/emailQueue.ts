@@ -5,14 +5,21 @@ import { Job, Queue, QueueEvents, Worker, WorkerOptions } from 'bullmq';
 import { sendEmail } from './handlers';
 import IORedis from 'ioredis';
 
-const connection = ENVIRONMENT.REDIS.URL.startsWith('rediss://')
-	? new IORedis(ENVIRONMENT.REDIS.URL, { maxRetriesPerRequest: null, offlineQueue: false })
+const redisRequiresTls = ENVIRONMENT.REDIS.URL.startsWith('rediss://') || ENVIRONMENT.REDIS.URL.includes('upstash.io');
+const connection = redisRequiresTls
+	? new IORedis({
+			port: ENVIRONMENT.REDIS.PORT,
+			host: ENVIRONMENT.REDIS.URL,
+			password: ENVIRONMENT.REDIS.PASSWORD,
+			maxRetriesPerRequest: null,
+			offlineQueue: false,
+			tls: {},
+		})
 	: new IORedis({
 			port: ENVIRONMENT.REDIS.PORT,
 			host: ENVIRONMENT.REDIS.URL,
 			password: ENVIRONMENT.REDIS.PASSWORD,
 			maxRetriesPerRequest: null,
-			//enableOfflineQueue: false,
 			offlineQueue: false,
 		});
 

@@ -4,11 +4,17 @@ import { ENVIRONMENT } from './environment';
 let redisClient: IORedis;
 export const connectRedis = async (): Promise<void> => {
 	try {
-		redisClient = ENVIRONMENT.REDIS.URL.startsWith('rediss://')
-			? new IORedis(ENVIRONMENT.REDIS.URL, {
+		const redisRequiresTls =
+			ENVIRONMENT.REDIS.URL.startsWith('rediss://') || ENVIRONMENT.REDIS.URL.includes('upstash.io');
+		redisClient = redisRequiresTls
+			? new IORedis({
+					port: ENVIRONMENT.REDIS.PORT,
+					host: ENVIRONMENT.REDIS.URL,
+					password: ENVIRONMENT.REDIS.PASSWORD,
 					maxRetriesPerRequest: null,
 					enableOfflineQueue: false,
 					offlineQueue: false,
+					tls: {},
 				})
 			: new IORedis({
 					port: ENVIRONMENT.REDIS.PORT,
