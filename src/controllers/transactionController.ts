@@ -161,6 +161,15 @@ export class TransactionController {
 		if (!transactionId) throw new AppError('Transaction ID is required', 400);
 		if (!userId) throw new AppError('User ID is required', 400);
 
+		// Validate UUID format
+		const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+		if (!uuidRegex.test(transactionId)) {
+			throw new AppError('Invalid transaction ID format', 400);
+		}
+		if (!uuidRegex.test(userId)) {
+			throw new AppError('Invalid user ID format', 400);
+		}
+
 		const transaction = await transactionRepository.findById(transactionId);
 		if (!transaction) throw new AppError('No transaction found', 404);
 
@@ -180,8 +189,12 @@ export class TransactionController {
 		}
 
 		if (status === 'completed') {
+			const currentBalance = Number(userWallet[0].balance) || 0;
+			const txAmount = Number(transaction.amount) || 0;
+			const newBalance = currentBalance + txAmount;
+
 			await walletRepository.update(userWallet[0].id, {
-				balance: (userWallet[0].balance += transaction.amount),
+				balance: newBalance,
 			});
 
 			await sendSuccessfulDepositEmail(
@@ -212,6 +225,15 @@ export class TransactionController {
 		if (!transactionId) throw new AppError('Transaction ID is required', 400);
 		if (!userId) throw new AppError('User ID is required', 400);
 
+		// Validate UUID format
+		const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+		if (!uuidRegex.test(transactionId)) {
+			throw new AppError('Invalid transaction ID format', 400);
+		}
+		if (!uuidRegex.test(userId)) {
+			throw new AppError('Invalid user ID format', 400);
+		}
+
 		const transaction = await transactionRepository.findById(transactionId);
 		if (!transaction) throw new AppError('No transaction found', 404);
 
@@ -230,17 +252,21 @@ export class TransactionController {
 			});
 		}
 
-		const withdrawable = userWallet[0].balance + userWallet[0].portfolioBalance;
-		if (withdrawable < transaction.amount) {
+		const currentBalance = Number(userWallet[0].balance) || 0;
+		const currentPortfolio = Number(userWallet[0].portfolioBalance) || 0;
+		const withdrawable = currentBalance + currentPortfolio;
+		const txAmount = Number(transaction.amount) || 0;
+
+		if (withdrawable < txAmount) {
 			throw new AppError('Insufficient funds', 400);
 		}
 
 		if (status === 'completed') {
 			const wallet = userWallet[0];
-			let remainingAmount = transaction.amount;
+			let remainingAmount = txAmount;
 
-			let newBalance = wallet.balance;
-			let newPortfolioBalance = wallet.portfolioBalance;
+			let newBalance = currentBalance;
+			let newPortfolioBalance = currentPortfolio;
 
 			// Subtract from balance first
 			if (remainingAmount <= newBalance) {
