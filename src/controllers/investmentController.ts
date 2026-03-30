@@ -6,6 +6,89 @@ import { referralService, Transaction } from '@/services';
 import { TransactionStatus } from '@/common/constants';
 import { DateTime } from 'luxon';
 
+function getDurationForPercentage(percentage: number): number {
+	if (percentage >= 12) return 5;
+	if (percentage >= 7) return 3;
+	return 2;
+}
+
+function resolvePercentageAndDuration(plan: string, isRetirement: boolean, reqPercentage?: number, reqAmount?: number) {
+	let percentage = reqPercentage || 0;
+	let amount = reqAmount || 0;
+
+	if (!reqPercentage && !reqAmount) {
+		const planLower = plan.toLowerCase();
+		if (
+			planLower.includes('basic') ||
+			planLower.includes('starter') ||
+			planLower.includes('foundation') ||
+			planLower.includes('entry')
+		) {
+			amount = isRetirement ? 5000 : 350;
+			percentage = 5.2;
+		} else if (
+			planLower.includes('plus') ||
+			planLower.includes('explore') ||
+			planLower.includes('satellite') ||
+			planLower.includes('basket') ||
+			planLower.includes('ladder') ||
+			planLower.includes('diversified portfolio') ||
+			planLower.includes('farm index')
+		) {
+			amount = isRetirement ? 10000 : 1000;
+			percentage = 7.8;
+		} else if (
+			planLower.includes('premium') ||
+			planLower.includes('gold') ||
+			planLower.includes('platinum') ||
+			planLower.includes('diamond') ||
+			planLower.includes('secure') ||
+			planLower.includes('income') ||
+			planLower.includes('futures') ||
+			planLower.includes('barbell') ||
+			planLower.includes('ownership') ||
+			planLower.includes('farmland')
+		) {
+			amount = isRetirement ? 25000 : 5000;
+			percentage = 12.4;
+		} else if (planLower.includes('trial')) {
+			amount = 100;
+			percentage = 5.2;
+		}
+	}
+
+	if (percentage === 0) {
+		const planLower = plan.toLowerCase();
+		if (
+			planLower.includes('starter') ||
+			planLower.includes('foundation') ||
+			planLower.includes('entry') ||
+			planLower.includes('trial')
+		)
+			percentage = 5.2;
+		else if (
+			planLower.includes('explore') ||
+			planLower.includes('satellite') ||
+			planLower.includes('basket') ||
+			planLower.includes('ladder') ||
+			planLower.includes('diversified portfolio') ||
+			planLower.includes('farm index')
+		)
+			percentage = 7.8;
+		else if (
+			planLower.includes('secure') ||
+			planLower.includes('income') ||
+			planLower.includes('futures') ||
+			planLower.includes('barbell') ||
+			planLower.includes('ownership') ||
+			planLower.includes('farmland')
+		)
+			percentage = 12.4;
+	}
+
+	return { percentage, amount };
+}
+
 export class InvestmentController {
 	confirm = catchAsync(async (req: Request, res: Response) => {
 		const { user } = req;
@@ -18,95 +101,19 @@ export class InvestmentController {
 		if (!type) throw new AppError('Investment Type is required', 400);
 		if (!symbol) throw new AppError('Symbol is required', 400);
 
-		// Check wallet
 		let walletBalance = await walletRepository.findByUserId(user.id);
 		if (!walletBalance || walletBalance.length === 0) {
 			walletBalance = await walletRepository.create({ userId: user.id });
 		}
 
-		// Try to find the plan in sys_plan for duration
 		const sysPlan = await planRepository.findByName(plan);
-
-		let amount = reqAmount || 0;
-		let percentage = percentageProfit || 0;
-
-		// If no specific amount/percentage provided, fallback to plan names
-		if (!reqAmount && !percentageProfit) {
-			const planLower = plan.toLowerCase();
-			if (
-				planLower.includes('basic') ||
-				planLower.includes('starter') ||
-				planLower.includes('foundation') ||
-				planLower.includes('entry')
-			) {
-				amount = isRetirement ? 5000 : 350;
-				percentage = 5.2;
-			} else if (
-				planLower.includes('plus') ||
-				planLower.includes('explore') ||
-				planLower.includes('satellite') ||
-				planLower.includes('basket') ||
-				planLower.includes('ladder') ||
-				planLower.includes('diversified portfolio') ||
-				planLower.includes('farm index')
-			) {
-				amount = isRetirement ? 10000 : 1000;
-				percentage = 7.8;
-			} else if (
-				planLower.includes('premium') ||
-				planLower.includes('gold') ||
-				planLower.includes('platinum') ||
-				planLower.includes('diamond') ||
-				planLower.includes('secure') ||
-				planLower.includes('income') ||
-				planLower.includes('futures') ||
-				planLower.includes('barbell') ||
-				planLower.includes('ownership') ||
-				planLower.includes('farmland')
-			) {
-				amount = isRetirement ? 25000 : 5000;
-				percentage = 12.4;
-			} else if (planLower.includes('trial')) {
-				amount = 100;
-				percentage = 5.2;
-			}
-		}
-
-		// Ensure percentage is set if still 0
-		if (percentage === 0) {
-			const planLower = plan.toLowerCase();
-			if (
-				planLower.includes('starter') ||
-				planLower.includes('foundation') ||
-				planLower.includes('entry') ||
-				planLower.includes('trial')
-			)
-				percentage = 5.2;
-			else if (
-				planLower.includes('explore') ||
-				planLower.includes('satellite') ||
-				planLower.includes('basket') ||
-				planLower.includes('ladder') ||
-				planLower.includes('diversified portfolio') ||
-				planLower.includes('farm index')
-			)
-				percentage = 7.8;
-			else if (
-				planLower.includes('secure') ||
-				planLower.includes('income') ||
-				planLower.includes('futures') ||
-				planLower.includes('barbell') ||
-				planLower.includes('ownership') ||
-				planLower.includes('farmland')
-			)
-				percentage = 12.4;
-		}
+		const { percentage, amount } = resolvePercentageAndDuration(plan, isRetirement, percentageProfit, reqAmount);
 
 		if (amount <= 0) throw new AppError('Invalid investment amount', 400);
 
-		const durationDays = sysPlan?.duration_days || 1;
-		const expectedProfit = (amount * percentage) / 100;
-		const expectedTotal = amount + expectedProfit;
+		const durationDays = sysPlan?.duration_days || getDurationForPercentage(percentage);
+		const expectedProfit = Number(((amount * percentage) / 100).toFixed(2));
+		const expectedTotal = Number((amount + expectedProfit).toFixed(2));
 
 		return AppResponse(
 			res,
@@ -152,98 +159,22 @@ export class InvestmentController {
 		if (!type) throw new AppError('Investment Type is required', 400);
 		if (!symbol) throw new AppError('Symbol is required', 400);
 
-		// Try to find the plan in sys_plan for duration
 		const sysPlan = await planRepository.findByName(plan);
 
 		let walletBalance = await walletRepository.findByUserId(user.id);
 		if (!walletBalance || walletBalance.length === 0) {
-			walletBalance = await walletRepository.create({
-				userId: user.id,
-			});
+			walletBalance = await walletRepository.create({ userId: user.id });
 		}
 
-		let amount = reqAmount || 0;
-		let percentage = percentageProfit || 0;
-
-		// If no specific amount/percentage provided, fallback to plan names
-		if (!reqAmount && !percentageProfit) {
-			const planLower = plan.toLowerCase();
-			if (
-				planLower.includes('basic') ||
-				planLower.includes('starter') ||
-				planLower.includes('foundation') ||
-				planLower.includes('entry')
-			) {
-				amount = isRetirement ? 5000 : 350;
-				percentage = 5.2;
-			} else if (
-				planLower.includes('plus') ||
-				planLower.includes('explore') ||
-				planLower.includes('satellite') ||
-				planLower.includes('basket') ||
-				planLower.includes('ladder') ||
-				planLower.includes('diversified portfolio') ||
-				planLower.includes('farm index')
-			) {
-				amount = isRetirement ? 10000 : 1000;
-				percentage = 7.8;
-			} else if (
-				planLower.includes('premium') ||
-				planLower.includes('gold') ||
-				planLower.includes('platinum') ||
-				planLower.includes('diamond') ||
-				planLower.includes('secure') ||
-				planLower.includes('income') ||
-				planLower.includes('futures') ||
-				planLower.includes('barbell') ||
-				planLower.includes('ownership') ||
-				planLower.includes('farmland')
-			) {
-				amount = isRetirement ? 25000 : 5000;
-				percentage = 12.4;
-			} else if (planLower.includes('trial')) {
-				amount = 100;
-				percentage = 5.2;
-			}
-		}
-
-		// Ensure percentage is set if it's still 0 but we have a plan
-		if (percentage === 0) {
-			const planLower = plan.toLowerCase();
-			if (
-				planLower.includes('starter') ||
-				planLower.includes('foundation') ||
-				planLower.includes('entry') ||
-				planLower.includes('trial')
-			)
-				percentage = 5.2;
-			else if (
-				planLower.includes('explore') ||
-				planLower.includes('satellite') ||
-				planLower.includes('basket') ||
-				planLower.includes('ladder') ||
-				planLower.includes('diversified portfolio') ||
-				planLower.includes('farm index')
-			)
-				percentage = 7.8;
-			else if (
-				planLower.includes('secure') ||
-				planLower.includes('income') ||
-				planLower.includes('futures') ||
-				planLower.includes('barbell') ||
-				planLower.includes('ownership') ||
-				planLower.includes('farmland')
-			)
-				percentage = 12.4;
-		}
+		const { percentage, amount } = resolvePercentageAndDuration(plan, isRetirement, percentageProfit, reqAmount);
 
 		if (amount <= 0) throw new AppError('Invalid investment amount', 400);
 		if (walletBalance[0].balance < amount) {
 			throw new AppError('Insufficient Balance', 400);
 		}
 
-		const durationDays = sysPlan?.duration_days || null;
-		const maturesAt = durationDays ? DateTime.now().plus({ days: durationDays }).toJSDate() : null;
+		const durationDays = sysPlan?.duration_days || getDurationForPercentage(percentage);
+		const maturesAt = DateTime.now().plus({ days: durationDays }).toJSDate();
 
 		const [investment] = await investmentRepository.create({
 			userId: user.id,
@@ -344,17 +275,14 @@ export class InvestmentController {
 		const walletArr = await walletRepository.findByUserId(user.id);
 		const userWallet = walletArr[0];
 
-		// Update wallet balance
 		await walletRepository.update(userWallet.id, {
 			balance: Number(userWallet.balance) + profit,
 		});
 
-		// Reset investment profit
 		await investmentRepository.update(investmentId, {
 			dailyProfit: 0,
 		});
 
-		// Log transaction
 		await Transaction.add({
 			userId: user.id,
 			amount: profit,
@@ -386,18 +314,15 @@ export class InvestmentController {
 		const walletArr = await walletRepository.findByUserId(user.id);
 		const userWallet = walletArr[0];
 
-		// Update wallet: add total amount back, subtract from portfolio
 		await walletRepository.update(userWallet.id, {
 			balance: Number(userWallet.balance) + totalToReturn,
 			portfolioBalance: Math.max(0, Number(userWallet.portfolioBalance) - initialAmount),
 		});
 
-		// Mark investment as deleted
 		await investmentRepository.update(investmentId, {
 			isDeleted: true,
 		});
 
-		// Log transaction
 		await Transaction.add({
 			userId: user.id,
 			amount: totalToReturn,
