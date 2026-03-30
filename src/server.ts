@@ -27,6 +27,7 @@ import {
 	investementRouter,
 	messageRouter,
 	sysCryptoRouter,
+	planRouter,
 } from '@/routes';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
@@ -191,6 +192,7 @@ app.use('/api/v1/wallet', walletRouter);
 app.use('/api/v1/investment', investementRouter);
 app.use('/api/v1/message', messageRouter);
 app.use('/api/v1/crypto', sysCryptoRouter);
+app.use('/api/v1/plan', planRouter);
 
 app.all('/{*splat}', async (req, res) => {
 	logger.error('route not found ' + new Date(Date.now()) + ' ' + req.originalUrl);

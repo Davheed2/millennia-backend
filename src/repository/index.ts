@@ -9,3 +9,4 @@ export * from './walletRepository';
 export * from './investmentRepository';
 export * from './messageRepository';
 export * from './sysCryptoRepository';
+export * from './planRepository';

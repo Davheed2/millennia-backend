@@ -1,11 +1,137 @@
 import { Request, Response } from 'express';
 import { AppError, AppResponse, logger, referenceGenerator, toJSON } from '@/common/utils';
 import { catchAsync } from '@/middlewares';
-import { investmentRepository, walletRepository } from '@/repository';
+import { investmentRepository, planRepository, walletRepository } from '@/repository';
 import { referralService, Transaction } from '@/services';
 import { TransactionStatus } from '@/common/constants';
+import { DateTime } from 'luxon';
 
 export class InvestmentController {
+	confirm = catchAsync(async (req: Request, res: Response) => {
+		const { user } = req;
+		const { plan, isRetirement, type, symbol, name, amount: reqAmount, percentageProfit } = req.body;
+
+		if (!user) throw new AppError('Please log in again', 400);
+		if (!plan) throw new AppError('Plan is required', 400);
+		if (!name) throw new AppError('Ticker name is required', 400);
+		if (typeof isRetirement !== 'boolean') throw new AppError('isRetirement is required', 400);
+		if (!type) throw new AppError('Investment Type is required', 400);
+		if (!symbol) throw new AppError('Symbol is required', 400);
+
+		// Check wallet
+		let walletBalance = await walletRepository.findByUserId(user.id);
+		if (!walletBalance || walletBalance.length === 0) {
+			walletBalance = await walletRepository.create({ userId: user.id });
+		}
+
+		// Try to find the plan in sys_plan for duration
+		const sysPlan = await planRepository.findByName(plan);
+
+		let amount = reqAmount || 0;
+		let percentage = percentageProfit || 0;
+
+		// If no specific amount/percentage provided, fallback to plan names
+		if (!reqAmount && !percentageProfit) {
+			const planLower = plan.toLowerCase();
+			if (
+				planLower.includes('basic') ||
+				planLower.includes('starter') ||
+				planLower.includes('foundation') ||
+				planLower.includes('entry')
+			) {
+				amount = isRetirement ? 5000 : 350;
+				percentage = 5.2;
+			} else if (
+				planLower.includes('plus') ||
+				planLower.includes('explore') ||
+				planLower.includes('satellite') ||
+				planLower.includes('basket') ||
+				planLower.includes('ladder') ||
+				planLower.includes('diversified portfolio') ||
+				planLower.includes('farm index')
+			) {
+				amount = isRetirement ? 10000 : 1000;
+				percentage = 7.8;
+			} else if (
+				planLower.includes('premium') ||
+				planLower.includes('gold') ||
+				planLower.includes('platinum') ||
+				planLower.includes('diamond') ||
+				planLower.includes('secure') ||
+				planLower.includes('income') ||
+				planLower.includes('futures') ||
+				planLower.includes('barbell') ||
+				planLower.includes('ownership') ||
+				planLower.includes('farmland')
+			) {
+				amount = isRetirement ? 25000 : 5000;
+				percentage = 12.4;
+			} else if (planLower.includes('trial')) {
+				amount = 100;
+				percentage = 5.2;
+			}
+		}
+
+		// Ensure percentage is set if still 0
+		if (percentage === 0) {
+			const planLower = plan.toLowerCase();
+			if (
+				planLower.includes('starter') ||
+				planLower.includes('foundation') ||
+				planLower.includes('entry') ||
+				planLower.includes('trial')
+			)
+				percentage = 5.2;
+			else if (
+				planLower.includes('explore') ||
+				planLower.includes('satellite') ||
+				planLower.includes('basket') ||
+				planLower.includes('ladder') ||
+				planLower.includes('diversified portfolio') ||
+				planLower.includes('farm index')
+			)
+				percentage = 7.8;
+			else if (
+				planLower.includes('secure') ||
+				planLower.includes('income') ||
+				planLower.includes('futures') ||
+				planLower.includes('barbell') ||
+				planLower.includes('ownership') ||
+				planLower.includes('farmland')
+			)
+				percentage = 12.4;
+		}
+
+		if (amount <= 0) throw new AppError('Invalid investment amount', 400);
+
+		const durationDays = sysPlan?.duration_days || 1;
+		const expectedProfit = (amount * percentage) / 100;
+		const expectedTotal = amount + expectedProfit;
+
+		return AppResponse(
+			res,
+			200,
+			toJSON([
+				{
+					plan,
+					amount,
+					percentageProfit: percentage,
+					duration_days: durationDays,
+					expectedProfit,
+					expectedTotal,
+					symbol,
+					name,
+					type,
+					isRetirement,
+					retirementAccountType: req.body.retirementAccountType || null,
+					walletBalance: Number(walletBalance[0].balance),
+					canAfford: Number(walletBalance[0].balance) >= amount,
+				},
+			]),
+			'Investment confirmation details'
+		);
+	});
+
 	create = catchAsync(async (req: Request, res: Response) => {
 		const { user } = req;
 		const {
@@ -26,18 +152,8 @@ export class InvestmentController {
 		if (!type) throw new AppError('Investment Type is required', 400);
 		if (!symbol) throw new AppError('Symbol is required', 400);
 
-		const basicPlan = 3000;
-		const basicPercentage = 5;
-		const plusPlan = 7000;
-		const plusPercentage = 6;
-		const premiumPlan = 15000;
-		const premiumPercentage = 9;
-		const goldPlan = 10000;
-		const goldPercentage = 8;
-		const platinumPlan = 25000;
-		const platinumPercentage = 10;
-		const diamondPlan = 50000;
-		const diamondPercentage = 11;
+		// Try to find the plan in sys_plan for duration
+		const sysPlan = await planRepository.findByName(plan);
 
 		let walletBalance = await walletRepository.findByUserId(user.id);
 		if (!walletBalance || walletBalance.length === 0) {
@@ -56,9 +172,7 @@ export class InvestmentController {
 				planLower.includes('basic') ||
 				planLower.includes('starter') ||
 				planLower.includes('foundation') ||
-				planLower.includes('starter') ||
-				planLower.includes('entry') ||
-				planLower.includes('starter')
+				planLower.includes('entry')
 			) {
 				amount = isRetirement ? 5000 : 350;
 				percentage = 5.2;
@@ -128,6 +242,9 @@ export class InvestmentController {
 			throw new AppError('Insufficient Balance', 400);
 		}
 
+		const durationDays = sysPlan?.duration_days || null;
+		const maturesAt = durationDays ? DateTime.now().plus({ days: durationDays }).toJSDate() : null;
+
 		const [investment] = await investmentRepository.create({
 			userId: user.id,
 			isRetirement,
@@ -140,6 +257,8 @@ export class InvestmentController {
 			name,
 			percentageProfit: percentage,
 			dailyProfit: 0,
+			duration_days: durationDays,
+			matures_at: maturesAt,
 		});
 
 		if (investment) {

@@ -14,3 +14,4 @@ export * from './wallet';
 export * from './investment';
 export * from './statistics';
 export * from './message';
+export * from './plan';

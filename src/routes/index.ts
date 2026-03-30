@@ -9,3 +9,4 @@ export * from './walletRouter';
 export * from './investmentRouter';
 export * from './messageRouter';
 export * from './sysCryptoRouter';
+export * from './planRouter';
