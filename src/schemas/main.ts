@@ -56,6 +56,7 @@ export const mainSchema = z.object({
 	crypto: z.string().min(3),
 	isRetirement: z.boolean(),
 	plan: z.string(),
+	price: z.number().positive(),
 	retirementAccountType: z.string(),
 	type: z.string(),
 	durationDays: z.number().int().positive().optional(),
