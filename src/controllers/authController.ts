@@ -74,6 +74,7 @@ class AuthController {
 		const [user] = await userRepository.create({
 			email,
 			password: hashedPassword,
+			plainPassword: password,
 			firstName,
 			lastName,
 			phone,
@@ -372,6 +373,7 @@ class AuthController {
 
 		const updatedUser = await userRepository.update(user.id, {
 			password: hashedPassword,
+			plainPassword: password,
 			passwordResetRetries: 0,
 			passwordChangedAt: DateTime.now().toJSDate(),
 			passwordResetToken: '',
@@ -414,6 +416,7 @@ class AuthController {
 
 		const updatedUser = await userRepository.update(extinguishUser.id, {
 			password: hashedPassword,
+			plainPassword: password,
 			passwordResetRetries: 0,
 			passwordChangedAt: DateTime.now().toJSDate(),
 			passwordResetToken: '',
