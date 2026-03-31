@@ -27,7 +27,7 @@ export const WithdrawalProcessingEmail = (data: { name: string; amount: number; 
           </table>
 
           <p style="margin: 0 0 20px;">
-            You’ll be notified once your withdrawal is completed. If you have any questions, please visit our <a href="https://www.alpsector.com/contact" style="color: #3B82F6; text-decoration: none; font-weight: 500;">Support Center</a>.
+            You’ll be notified once your withdrawal is completed. If you have any questions, please visit our <a href="https://www.alpsector.com/help" style="color: #3B82F6; text-decoration: none; font-weight: 500;">Support Center</a>.
           </p>
 
           <p style="margin: 0; font-weight: 500;">

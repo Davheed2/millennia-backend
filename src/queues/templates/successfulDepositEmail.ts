@@ -27,7 +27,7 @@ export const DepositSuccessEmail = (data: { name: string; amount: number; refere
           </table>
 
           <p style="margin: 0 0 20px;">
-            You can now use your funds to explore all features on our platform. If you have any questions, please visit our <a href="https://www.alpsector.com/contact" style="color: #3B82F6; text-decoration: none; font-weight: 500;">Support Center</a>.
+            You can now use your funds to explore all features on our platform. If you have any questions, please visit our <a href="https://www.alpsector.com/help" style="color: #3B82F6; text-decoration: none; font-weight: 500;">Support Center</a>.
           </p>
 
           <p style="margin: 0; font-weight: 500;">

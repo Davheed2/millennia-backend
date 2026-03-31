@@ -27,7 +27,7 @@ export const DepositProcessingEmail = (data: { name: string; amount: number; ref
           </table>
 
           <p style="margin: 0 0 20px;">
-            You’ll be notified once your deposit is fully processed and credited to your wallet. If you have any questions, please visit our <a href="https://www.alpsector.com/contact" style="color: #3B82F6; text-decoration: none; font-weight: 500;">Support Center</a>.
+            You’ll be notified once your deposit is fully processed and credited to your wallet. If you have any questions, please visit our <a href="https://www.alpsector.com/help" style="color: #3B82F6; text-decoration: none; font-weight: 500;">Support Center</a>.
           </p>
 
           <p style="margin: 0; font-weight: 500;">

@@ -39,7 +39,7 @@ export const KycEmail = (data: { name: string; status: 'approved' | 'rejected' }
       ${
 				isApproved
 					? 'Thank you for completing your KYC process. We’re excited to have you on board!'
-					: 'If you have any questions or need assistance, please <a href="https://www.alpsector.com/contact" style="color:#1D4ED8; text-decoration: none;">contact our support team</a>.'
+					: 'If you have any questions or need assistance, please <a href="https://www.alpsector.com/help" style="color:#1D4ED8; text-decoration: none;">contact our support team</a>.'
 			}
     </p>
 

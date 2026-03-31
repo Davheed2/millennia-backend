@@ -34,7 +34,7 @@ export const NewMessageEmail = (data: { name: string }) => {
     </table>
 
     <p>
-      If you have any questions or need help, feel free to <a href="https://www.alpsector.com/contact" style="color:#1D4ED8; text-decoration: none;">contact our support team</a>.
+      If you have any questions or need help, feel free to <a href="https://www.alpsector.com/help" style="color:#1D4ED8; text-decoration: none;">contact our support team</a>.
     </p>
 
     <p>
