@@ -33,6 +33,10 @@ export enum InvestmentType {
 	RETIREMENT = 'retirement',
 	CRYPTO = 'crypto',
 	ETFS = 'etfs',
+	ENERGY = 'energy',
+	OIL_GAS = 'oil_gas',
+	FOREX = 'forex',
+	COMMODITY = 'commodity',
 }
 
 export enum MessageStatus {

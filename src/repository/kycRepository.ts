@@ -18,8 +18,12 @@ class KycRepository {
 			.returning('*');
 	};
 
+	findAllQuery = () => {
+		return knexDb.table('kyc').orderBy('created_at', 'desc');
+	};
+
 	findAll = async (): Promise<IKyc[]> => {
-		return await knexDb.table('kyc').orderBy('created_at', 'desc');
+		return await this.findAllQuery();
 	};
 
 	findByUserId = async (userId: string): Promise<IKyc> => {

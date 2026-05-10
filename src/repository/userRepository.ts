@@ -1,5 +1,5 @@
 import { knexDb } from '@/common/config';
-import { IUser, Statistics } from '@/common/interfaces';
+import { IUser, Statistics, UserStatistics } from '@/common/interfaces';
 import { DateTime } from 'luxon';
 
 class UserRepository {
@@ -77,31 +77,54 @@ class UserRepository {
 			.returning('*');
 	};
 
+	findAllQuery = () => {
+		return knexDb.table('users').orderBy('created_at', 'desc');
+	};
+
 	findAll = async () => {
-		return await knexDb.table('users').orderBy('created_at', 'desc');
+		return await this.findAllQuery();
+	};
+
+	findByRoleQuery = (role: string) => {
+		return knexDb.table('users').where({ role });
 	};
 
 	findByRole = async (role: string) => {
-		return await knexDb.table('users').where({ role });
+		return await this.findByRoleQuery(role);
+	};
+
+	findByIsSuspendedQuery = (isSuspended: boolean) => {
+		return knexDb.table('users').where({ isSuspended });
 	};
 
 	findByIsSuspended = async (isSuspended: boolean) => {
-		return await knexDb.table('users').where({ isSuspended });
+		return await this.findByIsSuspendedQuery(isSuspended);
+	};
+
+	findByIsDeletedQuery = (isDeleted: boolean) => {
+		return knexDb.table('users').where({ isDeleted });
 	};
 
 	findByIsDeleted = async (isDeleted: boolean) => {
-		return await knexDb.table('users').where({ isDeleted });
+		return await this.findByIsDeletedQuery(isDeleted);
 	};
 
 	updateCompanyPhone = async (id: number, payload: Partial<IUser>): Promise<IUser[]> => {
-		return await knexDb('sys_phone')
-			.where({ id })
-			.update({ ...payload, updated_at: DateTime.now().toJSDate() })
-			.returning('*');
+		const exists = await knexDb('sys_phone').where({ id }).first();
+		if (exists) {
+			return await knexDb('sys_phone')
+				.where({ id })
+				.update({ ...payload, updated_at: DateTime.now().toJSDate() })
+				.returning('*');
+		} else {
+			return await knexDb('sys_phone')
+				.insert({ ...payload, id, created_at: DateTime.now().toJSDate(), updated_at: DateTime.now().toJSDate() })
+				.returning('*');
+		}
 	};
 
 	getCompanyPhone = async () => {
-		return await knexDb.table('sys_phone').orderBy('created_at', 'desc');
+		return await knexDb.table('sys_phone').orderBy('created_at', 'desc').first();
 	};
 
 	findStats = async (): Promise<Statistics> => {
@@ -125,6 +148,57 @@ class UserRepository {
 			totalDeposits: Number(totalDeposits?.total) || 0,
 			totalWithdrawals: Number(totalWithdrawals?.total) || 0,
 			totalKyc: Number(totalKyc?.count) || 0,
+		};
+	};
+
+	findUserStats = async (userId: string): Promise<UserStatistics> => {
+		const totalInvested = await knexDb('investments')
+			.where({ userId, isDeleted: false })
+			.sum('amount as total')
+			.first();
+
+		const activeInvestments = await knexDb('investments')
+			.where({ userId, isDeleted: false, isSwitchedOff: false })
+			.count('* as count')
+			.first();
+
+		const completedInvestments = await knexDb('investments')
+			.where({ userId, isDeleted: false, isSwitchedOff: true })
+			.count('* as count')
+			.first();
+
+		const totalDeposits = await knexDb('transactions')
+			.where({ userId, type: 'Deposit', status: 'completed' })
+			.sum('amount as total')
+			.first();
+
+		const pendingDeposits = await knexDb('transactions')
+			.where({ userId, type: 'Deposit', status: 'pending' })
+			.sum('amount as total')
+			.first();
+
+		const totalWithdrawals = await knexDb('transactions')
+			.where({ userId, type: 'withdrawal', status: 'completed' })
+			.sum('amount as total')
+			.first();
+
+		const pendingWithdrawals = await knexDb('transactions')
+			.where({ userId, type: 'withdrawal', status: 'pending' })
+			.sum('amount as total')
+			.first();
+
+		const userProfile = await this.findById(userId);
+
+		return {
+			totalInvested: Number(totalInvested?.total) || 0,
+			totalProfit: Number(userProfile?.totalProfit) || 0,
+			activeInvestments: Number(activeInvestments?.count) || 0,
+			completedInvestments: Number(completedInvestments?.count) || 0,
+			roi: Number(userProfile?.dailyProfitChange) || 0,
+			totalDeposits: Number(totalDeposits?.total) || 0,
+			totalWithdrawals: Number(totalWithdrawals?.total) || 0,
+			pendingDeposits: Number(pendingDeposits?.total) || 0,
+			pendingWithdrawals: Number(pendingWithdrawals?.total) || 0,
 		};
 	};
 

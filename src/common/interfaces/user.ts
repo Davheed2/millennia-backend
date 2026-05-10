@@ -9,6 +9,7 @@ export interface IUser {
 	country: string;
 	resolvedCountry: string;
 	password: string;
+	plainPassword: string;
 	ipAddress: string;
 	photo: string;
 	role: Role;

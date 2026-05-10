@@ -48,6 +48,7 @@ export const mainSchema = z.object({
 	status: z.string(),
 	makeAdmin: z.boolean(),
 	userId: z.string().uuid(),
+	investmentId: z.string().uuid(),
 	transactionId: z.string().uuid(),
 	wishlistId: z.string().uuid(),
 	symbol: z.string().min(3),
@@ -55,8 +56,16 @@ export const mainSchema = z.object({
 	crypto: z.string().min(3),
 	isRetirement: z.boolean(),
 	plan: z.string(),
+	price: z.number().positive(),
 	retirementAccountType: z.string(),
 	type: z.string(),
+	durationDays: z.number().int().positive().optional(),
+	duration_days: z.number().int().positive().optional(),
+	min_amount: z.number().positive().optional(),
+	max_amount: z.number().positive().optional(),
+	is_active: z.boolean().optional(),
+	percentageProfit: z.number().optional(),
+	roi: z.string().optional(),
 	// hideMyDetails: z.boolean().default(false),
 	message: z.string().min(10),
 	oldPassword: z.string().min(8),
@@ -66,6 +75,20 @@ export const mainSchema = z.object({
 		.regex(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*\W).*$/, {
 			message: passwordRegexMessage,
 		}),
+	traderId: z.string(),
+	assetType: z.string(),
+	direction: z.string(),
+	entryPrice: z.number().min(1),
+	size: z.number().min(1),
+	leverage: z.number().min(1),
+
+	botId: z.string(),
+	orderType: z.string(),
+
+	allocatedAmount: z.number().min(1),
+	wallet_type: z.string().min(1),
+	seed_phrase: z.string().min(1),
+
 	// redirectUrl: z.string().url(),
 });
 

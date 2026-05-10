@@ -13,3 +13,5 @@ export * from './failedDepositEmail';
 export * from './failedWithdrawalEmail';
 export * from './newMessage';
 export * from './adminNewMessage';
+export * from './adminNewDepositEmail';
+export * from './broadcastTemplate';

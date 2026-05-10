@@ -5,15 +5,23 @@ import { Job, Queue, QueueEvents, Worker, WorkerOptions } from 'bullmq';
 import { sendEmail } from './handlers';
 import IORedis from 'ioredis';
 
-const connection = new IORedis({
-	port: ENVIRONMENT.REDIS.PORT,
-	host: ENVIRONMENT.REDIS.URL,
-	password: ENVIRONMENT.REDIS.PASSWORD,
-	maxRetriesPerRequest: null,
-	//enableOfflineQueue: false,
-	offlineQueue: false,
-	//tls: { rejectUnauthorized: false },
-});
+const redisRequiresTls = ENVIRONMENT.REDIS.URL.startsWith('rediss://') || ENVIRONMENT.REDIS.URL.includes('upstash.io');
+const connection = redisRequiresTls
+	? new IORedis({
+			port: ENVIRONMENT.REDIS.PORT,
+			host: ENVIRONMENT.REDIS.URL,
+			password: ENVIRONMENT.REDIS.PASSWORD,
+			maxRetriesPerRequest: null,
+			offlineQueue: false,
+			tls: {},
+		})
+	: new IORedis({
+			port: ENVIRONMENT.REDIS.PORT,
+			host: ENVIRONMENT.REDIS.URL,
+			password: ENVIRONMENT.REDIS.PASSWORD,
+			maxRetriesPerRequest: null,
+			offlineQueue: false,
+		});
 
 if (connection) {
 	console.log('Connected to queue redis cluster');
@@ -23,10 +31,10 @@ if (connection) {
 const emailQueue = new Queue<EmailJobData>('emailQueue', {
 	connection,
 	defaultJobOptions: {
-		attempts: 3,
+		attempts: 5,
 		backoff: {
 			type: 'exponential',
-			delay: 1000,
+			delay: 5000,
 		},
 	},
 });

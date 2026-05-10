@@ -76,6 +76,17 @@ export interface AdminNewMessageData extends CommonDataFields {
 	lastName: string;
 }
 
+export interface AdminNewDepositData extends CommonDataFields {
+	userName: string;
+	amount: number;
+	reference: string;
+}
+
+export interface BroadcastEmailData extends CommonDataFields {
+	title: string;
+	content: string;
+}
+
 export type EmailJobData =
 	| { type: 'signUpEmail'; data: SignUpEmailData }
 	| { type: 'welcomeEmail'; data: WelcomeEmailData }
@@ -91,3 +102,5 @@ export type EmailJobData =
 	| { type: 'failedWithdrawal'; data: FailedWithdrawalData }
 	| { type: 'newMessage'; data: NewMessageData }
 	| { type: 'adminNewMessage'; data: AdminNewMessageData }
+	| { type: 'adminNewDeposit'; data: AdminNewDepositData }
+	| { type: 'broadcastEmail'; data: BroadcastEmailData };

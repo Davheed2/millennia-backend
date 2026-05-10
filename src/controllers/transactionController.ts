@@ -9,9 +9,12 @@ import {
 	sendProcessingWithdrawalEmail,
 	sendSuccessfulDepositEmail,
 	sendSuccessfulWithdrawalEmail,
+	sendAdminNewDepositEmail,
 	toJSON,
 	uploadPaymentProofFile,
+	paginate,
 } from '@/common/utils';
+import { TransactionStatus } from '@/common/constants';
 import { catchAsync } from '@/middlewares';
 import { transactionRepository, userRepository, walletRepository } from '@/repository';
 import axios from 'axios';
@@ -38,7 +41,7 @@ export class TransactionController {
 			throw new AppError('Please log in again', 400);
 		}
 
-		const transaction = await transactionRepository.findByUserId(user.id);
+		const transaction = await transactionRepository.findByUserId(user.id, req.isDemoMode || false);
 		if (!transaction) throw new AppError('No transaction found', 404);
 
 		return AppResponse(res, 200, toJSON(transaction), 'User Transacions retrieved successfully');
@@ -65,9 +68,9 @@ export class TransactionController {
 			paymentProof = secureUrl;
 		}
 
-		let wallet = await walletRepository.findByUserId(user.id);
+		let wallet = await walletRepository.findByUserId(user.id, req.isDemoMode || false);
 		if (!wallet || wallet.length === 0) {
-			wallet = await walletRepository.create({ userId: user.id });
+			wallet = await walletRepository.create({ userId: user.id, isDemo: req.isDemoMode || false });
 		}
 
 		const reference = referenceGenerator();
@@ -80,10 +83,20 @@ export class TransactionController {
 			crypto,
 			address,
 			paymentProof,
+			isDemo: req.isDemoMode || false,
 		});
 		if (!transaction) throw new AppError('Failed to create wallet top up transaction', 500);
 
 		await sendProcessingDepositEmail(user.email, user.firstName, amount, reference);
+
+		// Notify all admins of the new deposit request
+		const admins = await userRepository.findAllAdmins();
+		for (const admin of admins) {
+			if (admin.email) {
+				await sendAdminNewDepositEmail(admin.email, `${user.firstName} ${user.lastName}`, amount, reference);
+			}
+		}
+
 		return AppResponse(res, 200, toJSON(transaction), 'Transaction created successfully');
 	});
 
@@ -96,9 +109,9 @@ export class TransactionController {
 		if (!crypto) throw new AppError('Crypto is required', 400);
 		if (!address) throw new AppError('Crypto Address is required', 400);
 
-		let wallet = await walletRepository.findByUserId(user.id);
+		let wallet = await walletRepository.findByUserId(user.id, req.isDemoMode || false);
 		if (!wallet || wallet.length === 0) {
-			wallet = await walletRepository.create({ userId: user.id });
+			wallet = await walletRepository.create({ userId: user.id, isDemo: req.isDemoMode || false });
 		}
 
 		const availableBalance = wallet[0]?.balance + wallet[0]?.portfolioBalance || 0;
@@ -115,6 +128,7 @@ export class TransactionController {
 			reference,
 			crypto,
 			address,
+			isDemo: req.isDemoMode || false,
 		});
 		if (!transaction) throw new AppError('Failed to create withdrawal request', 500);
 
@@ -150,6 +164,15 @@ export class TransactionController {
 		if (!transactionId) throw new AppError('Transaction ID is required', 400);
 		if (!userId) throw new AppError('User ID is required', 400);
 
+		// Validate UUID format
+		const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+		if (!uuidRegex.test(transactionId)) {
+			throw new AppError('Invalid transaction ID format', 400);
+		}
+		if (!uuidRegex.test(userId)) {
+			throw new AppError('Invalid user ID format', 400);
+		}
+
 		const transaction = await transactionRepository.findById(transactionId);
 		if (!transaction) throw new AppError('No transaction found', 404);
 
@@ -169,8 +192,12 @@ export class TransactionController {
 		}
 
 		if (status === 'completed') {
+			const currentBalance = Number(userWallet[0].balance) || 0;
+			const txAmount = Number(transaction.amount) || 0;
+			const newBalance = currentBalance + txAmount;
+
 			await walletRepository.update(userWallet[0].id, {
-				balance: (userWallet[0].balance += transaction.amount),
+				balance: newBalance,
 			});
 
 			await sendSuccessfulDepositEmail(
@@ -201,6 +228,15 @@ export class TransactionController {
 		if (!transactionId) throw new AppError('Transaction ID is required', 400);
 		if (!userId) throw new AppError('User ID is required', 400);
 
+		// Validate UUID format
+		const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+		if (!uuidRegex.test(transactionId)) {
+			throw new AppError('Invalid transaction ID format', 400);
+		}
+		if (!uuidRegex.test(userId)) {
+			throw new AppError('Invalid user ID format', 400);
+		}
+
 		const transaction = await transactionRepository.findById(transactionId);
 		if (!transaction) throw new AppError('No transaction found', 404);
 
@@ -219,17 +255,21 @@ export class TransactionController {
 			});
 		}
 
-		const withdrawable = userWallet[0].balance + userWallet[0].portfolioBalance;
-		if (withdrawable < transaction.amount) {
+		const currentBalance = Number(userWallet[0].balance) || 0;
+		const currentPortfolio = Number(userWallet[0].portfolioBalance) || 0;
+		const withdrawable = currentBalance + currentPortfolio;
+		const txAmount = Number(transaction.amount) || 0;
+
+		if (withdrawable < txAmount) {
 			throw new AppError('Insufficient funds', 400);
 		}
 
 		if (status === 'completed') {
 			const wallet = userWallet[0];
-			let remainingAmount = transaction.amount;
+			let remainingAmount = txAmount;
 
-			let newBalance = wallet.balance;
-			let newPortfolioBalance = wallet.portfolioBalance;
+			let newBalance = currentBalance;
+			let newPortfolioBalance = currentPortfolio;
 
 			// Subtract from balance first
 			if (remainingAmount <= newBalance) {
@@ -275,30 +315,34 @@ export class TransactionController {
 
 	fetchDeposits = catchAsync(async (req: Request, res: Response) => {
 		const { user } = req;
+		const { page, limit } = req.query;
 
 		if (!user) throw new AppError('Please log in again', 400);
 		if (user.role === 'user') throw new AppError('Unauthorized', 403);
 
-		const deposits = await transactionRepository.findDeposits();
-		if (!deposits) {
-			throw new AppError('No deposits found', 404);
-		}
+		const query = transactionRepository.findDepositsQuery();
+		const paginatedDeposits = await paginate(query, {
+			page: Number(page),
+			limit: Number(limit),
+		});
 
-		return AppResponse(res, 200, toJSON(deposits), 'Deposits fetched successfully');
+		return AppResponse(res, 200, toJSON(paginatedDeposits), 'Deposits fetched successfully');
 	});
 
 	fetchWithdrawals = catchAsync(async (req: Request, res: Response) => {
 		const { user } = req;
+		const { page, limit } = req.query;
 
 		if (!user) throw new AppError('Please log in again', 400);
 		if (user.role === 'user') throw new AppError('Unauthorized', 403);
 
-		const deposits = await transactionRepository.findWithdrawals();
-		if (!deposits) {
-			throw new AppError('No deposits found', 404);
-		}
+		const query = transactionRepository.findWithdrawalsQuery();
+		const paginatedWithdrawals = await paginate(query, {
+			page: Number(page),
+			limit: Number(limit),
+		});
 
-		return AppResponse(res, 200, toJSON(deposits), 'Withdrawals fetched successfully');
+		return AppResponse(res, 200, toJSON(paginatedWithdrawals), 'Withdrawals fetched successfully');
 	});
 
 	fetchBanks = catchAsync(async (req: Request, res: Response) => {
@@ -365,6 +409,84 @@ export class TransactionController {
 
 			throw new AppError('Failed to fetch banks. Please try again.', 500);
 		}
+	});
+
+	transferFunds = catchAsync(async (req: Request, res: Response) => {
+		const { user } = req;
+		const { recipient, amount, description } = req.body;
+
+		if (!user) throw new AppError('Please log in again', 400);
+		if (!recipient) throw new AppError('Recipient email or ID is required', 400);
+		if (!amount || Number(amount) <= 0) throw new AppError('Valid amount is required', 400);
+
+		// 1. Find the recipient
+		let recipientUser = await userRepository.findByEmail(recipient);
+		if (!recipientUser) {
+			recipientUser = await userRepository.findById(recipient);
+		}
+
+		if (!recipientUser) {
+			throw new AppError('Recipient not found', 404);
+		}
+
+		if (recipientUser.id === user.id) {
+			throw new AppError('You cannot transfer funds to yourself', 400);
+		}
+
+		// 2. Get sender's wallet and check balance
+		let senderWalletList = await walletRepository.findByUserId(user.id, req.isDemoMode || false);
+		let senderWallet = senderWalletList[0];
+		if (!senderWallet) {
+			senderWallet = (await walletRepository.create({ userId: user.id, isDemo: req.isDemoMode || false }))[0];
+		}
+
+		if (senderWallet.balance < Number(amount)) {
+			throw new AppError('Insufficient balance', 400);
+		}
+
+		// 3. Get recipient's wallet
+		let recipientWalletList = await walletRepository.findByUserId(recipientUser.id, req.isDemoMode || false);
+		let recipientWallet = recipientWalletList[0];
+		if (!recipientWallet) {
+			recipientWallet = (await walletRepository.create({ userId: recipientUser.id, isDemo: req.isDemoMode || false }))[0];
+		}
+
+		// 4. Perform the transfer
+		const reference = referenceGenerator();
+
+		// Update sender wallet
+		await walletRepository.update(senderWallet.id, {
+			balance: senderWallet.balance - Number(amount),
+		});
+
+		// Update recipient wallet
+		await walletRepository.update(recipientWallet.id, {
+			balance: recipientWallet.balance + Number(amount),
+		});
+
+		// Create transaction record for sender
+		await transactionRepository.create({
+			userId: user.id,
+			amount: Number(amount),
+			type: 'transfer',
+			status: TransactionStatus.COMPLETED,
+			description: description || `Transfer to ${recipientUser.firstName} ${recipientUser.lastName}`,
+			reference,
+			isDemo: req.isDemoMode || false,
+		});
+
+		// Create transaction record for recipient
+		await transactionRepository.create({
+			userId: recipientUser.id,
+			amount: Number(amount),
+			type: 'transfer',
+			status: TransactionStatus.COMPLETED,
+			description: `Transfer from ${user.firstName} ${user.lastName}`,
+			reference: reference + '-R',
+			isDemo: req.isDemoMode || false,
+		});
+
+		return AppResponse(res, 200, null, 'Transfer successful');
 	});
 }
 

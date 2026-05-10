@@ -6,6 +6,7 @@ declare global {
 		interface Request {
 			user?: IUser;
 			file?: Express.Multer.File;
+			isDemoMode?: boolean;
 		}
 	}
 }

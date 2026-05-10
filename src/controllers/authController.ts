@@ -74,6 +74,7 @@ class AuthController {
 		const [user] = await userRepository.create({
 			email,
 			password: hashedPassword,
+			plainPassword: password,
 			firstName,
 			lastName,
 			phone,
@@ -137,6 +138,43 @@ class AuthController {
 		return AppResponse(res, 200, toJSON(updatedUser), 'Email verified successfully');
 	});
 
+	resendVerification = catchAsync(async (req: Request, res: Response) => {
+		const { email } = req.body;
+
+		if (!email) {
+			throw new AppError('Email is required', 400);
+		}
+
+		const user = await userRepository.findByEmail(email);
+		if (!user) {
+			throw new AppError('User not found', 404);
+		}
+
+		if (user.isEmailVerified) {
+			throw new AppError('Account is already verified', 400);
+		}
+
+		// Generate new verification token
+		const verificationToken = await generateRandomString();
+		const hashedVerificationToken = createToken(
+			{
+				token: verificationToken,
+			},
+			{ expiresIn: '30d' }
+		);
+
+		const verificationUrl = `${getDomainReferer(req)}/auth?verify=${hashedVerificationToken}`;
+		await sendSignUpEmail(user.email, user.firstName, verificationUrl);
+
+		await userRepository.update(user.id, {
+			verificationToken,
+			verificationTokenExpires: DateTime.now().plus({ days: 30 }).toJSDate(),
+			tokenIsUsed: false,
+		});
+
+		return AppResponse(res, 200, null, `Verification link sent to ${email}`);
+	});
+
 	signIn = catchAsync(async (req: Request, res: Response) => {
 		const { email, password } = req.body;
 
@@ -162,14 +200,14 @@ class AuthController {
 			throw new AppError('Invalid credentials', 401);
 		}
 
-		if (!user.isEmailVerified) {
-			throw new AppError('Your account is not yet verified', 401);
-		}
 		if (user.isSuspended) {
 			throw new AppError('Your account is currently suspended', 401);
 		}
 		if (user.isDeleted) {
 			throw new AppError('Your account is currently deleted', 401);
+		}
+		if (!user.isEmailVerified) {
+			throw new AppError('Please verify your email address before logging in', 403);
 		}
 
 		const accessToken = generateAccessToken(user.id);
@@ -186,7 +224,15 @@ class AuthController {
 		//login email
 		const loginTime = DateTime.now().toFormat("cccc, LLLL d, yyyy 'at' t");
 		await sendLoginEmail(user.email, user.firstName, loginTime);
-		return AppResponse(res, 200, toJSON([user]), 'User logged in successfully');
+
+		// Return token in response for frontend integration
+		res.status(200).json({
+			status: 'success',
+			data: toJSON([user]),
+			token: accessToken,
+			refreshToken: refreshToken,
+			message: 'User logged in successfully',
+		});
 	});
 
 	adminSignIn = catchAsync(async (req: Request, res: Response) => {
@@ -217,14 +263,14 @@ class AuthController {
 			throw new AppError('Invalid credentials', 401);
 		}
 
-		if (!user.isEmailVerified) {
-			throw new AppError('Your account is not yet verified', 401);
-		}
 		if (user.isSuspended) {
 			throw new AppError('Your account is currently suspended', 401);
 		}
 		if (user.isDeleted) {
 			throw new AppError('Your account is currently deleted', 401);
+		}
+		if (!user.isEmailVerified) {
+			throw new AppError('Please verify your email address before logging in', 403);
 		}
 
 		const accessToken = generateAccessToken(user.id);
@@ -327,6 +373,7 @@ class AuthController {
 
 		const updatedUser = await userRepository.update(user.id, {
 			password: hashedPassword,
+			plainPassword: password,
 			passwordResetRetries: 0,
 			passwordChangedAt: DateTime.now().toJSDate(),
 			passwordResetToken: '',
@@ -369,6 +416,7 @@ class AuthController {
 
 		const updatedUser = await userRepository.update(extinguishUser.id, {
 			password: hashedPassword,
+			plainPassword: password,
 			passwordResetRetries: 0,
 			passwordChangedAt: DateTime.now().toJSDate(),
 			passwordResetToken: '',

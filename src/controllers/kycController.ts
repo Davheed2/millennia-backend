@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { AppError, AppResponse, sendKycEmail, toJSON, uploadKycDocumentFile, uploadPictureFile } from '@/common/utils';
+import { AppError, AppResponse, paginate, sendKycEmail, toJSON, uploadKycDocumentFile, uploadPictureFile } from '@/common/utils';
 import { catchAsync } from '@/middlewares';
 import { kycRepository, userRepository } from '@/repository';
 
@@ -107,6 +107,7 @@ export class KycController {
 
 	findAll = catchAsync(async (req: Request, res: Response) => {
 		const { user } = req;
+		const { page, limit } = req.query;
 
 		if (!user) {
 			throw new AppError('Please log in again', 400);
@@ -115,12 +116,13 @@ export class KycController {
 			throw new AppError('You are not authorized to view this', 400);
 		}
 
-		const usersKyc = await kycRepository.findAll();
-		if (!usersKyc) {
-			throw new AppError('No kyc found', 404);
-		}
+		const query = kycRepository.findAllQuery();
+		const paginatedKyc = await paginate(query, {
+			page: Number(page),
+			limit: Number(limit),
+		});
 
-		return AppResponse(res, 200, toJSON(usersKyc), 'All KYC retrieved successfully');
+		return AppResponse(res, 200, toJSON(paginatedKyc), 'All KYC retrieved successfully');
 	});
 
 	update = catchAsync(async (req: Request, res: Response) => {

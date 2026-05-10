@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { AppError, AppResponse, toJSON, uploadPictureFile } from '@/common/utils';
+import { AppError, AppResponse, paginate, toJSON, uploadPictureFile } from '@/common/utils';
 import { catchAsync } from '@/middlewares';
 import { userRepository } from '@/repository';
 import { IUser } from '@/common/interfaces';
@@ -23,6 +23,7 @@ export class UserController {
 
 	getAllUsers = catchAsync(async (req: Request, res: Response) => {
 		const { user } = req;
+		const { page, limit } = req.query;
 
 		if (!user) {
 			throw new AppError('Please log in again', 401);
@@ -32,12 +33,13 @@ export class UserController {
 			throw new AppError('Only admins can view all users', 403);
 		}
 
-		const extinguishUsers = await userRepository.findAll();
-		if (!extinguishUsers) {
-			throw new AppError('No users found', 404);
-		}
+		const query = userRepository.findAllQuery();
+		const paginatedUsers = await paginate(query, {
+			page: Number(page),
+			limit: Number(limit),
+		});
 
-		return AppResponse(res, 200, toJSON(extinguishUsers), 'Users retrieved successfully');
+		return AppResponse(res, 200, toJSON(paginatedUsers), 'Users retrieved successfully');
 	});
 
 	updateProfile = catchAsync(async (req: Request, res: Response) => {
@@ -230,11 +232,7 @@ export class UserController {
 
 	getCompanyPhone = catchAsync(async (req: Request, res: Response) => {
 		const phone = await userRepository.getCompanyPhone();
-		if (!phone) {
-			throw new AppError(`Company Phone not found`, 500);
-		}
-
-		return AppResponse(res, 200, toJSON(phone), `Company Phone fetched successfully`);
+		return AppResponse(res, 200, phone ? toJSON(phone) : null, `Company Phone fetched successfully`);
 	});
 
 	updateCompanyPhone = catchAsync(async (req: Request, res: Response) => {
@@ -252,11 +250,11 @@ export class UserController {
 		}
 
 		const updateProfile = await userRepository.updateCompanyPhone(1, { phone });
-		if (!updateProfile) {
+		if (!updateProfile || updateProfile.length === 0) {
 			throw new AppError('Failed to update company phone', 500);
 		}
 
-		return AppResponse(res, 200, toJSON(updateProfile), 'Company phone updated successfully');
+		return AppResponse(res, 200, toJSON(updateProfile[0]), 'Company phone updated successfully');
 	});
 
 	findStats = catchAsync(async (req: Request, res: Response) => {
@@ -266,7 +264,8 @@ export class UserController {
 			throw new AppError('Please log in again', 400);
 		}
 		if (user.role === 'user') {
-			throw new AppError('Unauthorized access', 401);
+			const userStatistics = await userRepository.findUserStats(user.id);
+			return AppResponse(res, 200, toJSON([userStatistics]), 'User statistics fetched successfully');
 		}
 
 		const statistics = await userRepository.findStats();

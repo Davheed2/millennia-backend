@@ -14,3 +14,7 @@ export * from './wallet';
 export * from './investment';
 export * from './statistics';
 export * from './message';
+export * from './plan';
+export * from './assets';
+export * from './copyTrading';
+export * from './tradingFeatures';

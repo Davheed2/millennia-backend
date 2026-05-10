@@ -156,10 +156,12 @@ import {
 	FailedWithdrawalData,
 	NewMessageData,
 	AdminNewMessageData,
+	AdminNewDepositData,
+	BroadcastEmailData,
 } from '@/common/interfaces';
 import { logger } from '@/common/utils';
 import { Resend } from 'resend';
-import { ENVIRONMENT } from 'src/common/config';
+import { ENVIRONMENT } from '@/common/config';
 import {
 	forgotPasswordEmail,
 	loginEmail,
@@ -175,11 +177,14 @@ import {
 	WithdrawalFailedEmail,
 	NewMessageEmail,
 	AdminNewMessageEmail,
+	AdminNewDepositEmail,
+	BroadcastEmail,
 } from '../templates';
 import { Job } from 'bullmq';
 
-// Initialize Resend with your API key
 const resend = new Resend(ENVIRONMENT.EMAIL.RESEND_API_KEY);
+
+const EMAIL_TIMEOUT = 30000;
 
 export const sendEmail = async (job: Job<EmailJobData>) => {
 	const { type, data } = job.data;
@@ -248,22 +253,56 @@ export const sendEmail = async (job: Job<EmailJobData>) => {
 			htmlContent = AdminNewMessageEmail(data as AdminNewMessageData);
 			subject = 'New Message Alert';
 			break;
+		case 'adminNewDeposit':
+			htmlContent = AdminNewDepositEmail(data as AdminNewDepositData);
+			subject = 'New Deposit Request';
+			break;
+		case 'broadcastEmail': {
+			const broadcastData = data as BroadcastEmailData;
+			htmlContent = BroadcastEmail(broadcastData);
+			subject = `[Millennia Trades] ${broadcastData.title}`;
+			break;
+		}
 		default:
 			throw new Error(`No template found for email type: ${type}`);
 	}
 
 	try {
-		const result = await resend.emails.send({
-			from: 'Millennia Trades <support@milleniatrades.com>',
-			to: data.to,
-			subject: subject,
-			html: htmlContent,
-		});
+		const result = await Promise.race([
+			resend.emails.send({
+				from: 'Millennia Trades <support@milleniatrades.com>',
+				to: data.to,
+				subject,
+				html: htmlContent,
+			}),
+			new Promise((_, reject) => setTimeout(() => reject(new Error('EMAIL_TIMEOUT')), EMAIL_TIMEOUT)),
+		]);
 
-		console.log(result);
-		logger.info(`Email successfully sent to ${data.to}`);
-	} catch (error) {
-		console.error(error);
-		logger.error(`Failed to send email to ${data.to}: ${error}`);
+		logger.info(`Email sent to ${data.to}:`, result);
+	} catch (error: unknown) {
+		const errorMessage = error instanceof Error ? error.message : String(error);
+		const errorCode = (error as { code?: string }).code;
+
+		console.error('Email send error:', errorMessage, errorCode);
+
+		if (
+			errorCode === 'ECONNRESET' ||
+			errorCode === 'ETIMEDOUT' ||
+			errorCode === 'ENOTFOUND' ||
+			errorCode === 'ECONNREFUSED' ||
+			errorMessage.includes('ECONNRESET') ||
+			errorMessage.includes('EMAIL_TIMEOUT') ||
+			errorMessage.includes('timeout') ||
+			errorMessage.includes('socket')
+		) {
+			logger.error(`Retryable email error: ${errorMessage}`);
+			throw new Error('RETRYABLE_EMAIL_ERROR');
+		}
+
+		logger.error(`Failed to send email to ${data.to}: ${errorMessage}`);
+		throw error;
 	}
 };
+
+export * from './handleCopyOpen';
+export * from './handleCopyClose';

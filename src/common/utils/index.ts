@@ -13,3 +13,4 @@ export * from './appResponse';
 export * from './helper';
 export * from './authenticate';
 export * from './upload';
+export * from './paginate';

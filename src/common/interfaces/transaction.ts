@@ -11,6 +11,7 @@ export interface ITransaction {
 	reference: string;
 	crypto: string;
 	address: string;
+	isDemo?: boolean;
 	created_at?: Date;
 	updated_at?: Date;
 }

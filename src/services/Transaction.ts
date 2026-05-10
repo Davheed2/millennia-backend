@@ -4,7 +4,7 @@ import { transactionRepository } from '@/repository';
 
 class TransactionService {
 	async add(payload: Partial<ITransaction>): Promise<ITransaction[]> {
-		const { userId, amount, type, description, status, reference } = payload;
+		const { userId, amount, type, description, status, reference, isDemo } = payload;
 
 		if (!userId || !amount || !type || !description || !status || !reference) {
 			throw new AppError('Missing transaction data', 400);
@@ -17,6 +17,7 @@ class TransactionService {
 			description,
 			status,
 			reference,
+			isDemo,
 		});
 
 		return transaction;

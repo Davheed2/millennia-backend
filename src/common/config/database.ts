@@ -10,15 +10,18 @@ export const knexConfig: Knex.Config = {
 		database: ENVIRONMENT.DB.DATABASE,
 		port: ENVIRONMENT.DB.PORT ? parseInt(ENVIRONMENT.DB.PORT, 10) : 5432,
 		//ssl: ENVIRONMENT.DB.SSL ? { rejectUnauthorized: false } : false,
-		...(ENVIRONMENT.APP.ENV === 'production' ? { ssl: { rejectUnauthorized: true } } : {}),
+		...(ENVIRONMENT.APP.ENV === 'production' ? { ssl: { rejectUnauthorized: false } } : {}),
 	},
-	pool: { min: 1, max: 5, idleTimeoutMillis: 600000, propagateCreateError: false },
+	pool: { min: 1, max: 2, idleTimeoutMillis: 600000, propagateCreateError: false },
 	migrations: {
 		tableName: 'knex_migrations',
-		directory: process.env.NODE_ENV === 'production' ? './migrations' : './migrations',
-		extension: process.env.NODE_ENV === 'production' ? 'js' : 'ts',
+		directory: process.cwd().includes('build') ? './migrations' : './migrations',
+		extension: 'js',
 	},
-	acquireConnectionTimeout: 5000,
+	seeds: {
+		directory: './seeds',
+	},
+	acquireConnectionTimeout: 20000,
 };
 
 export const knexDb = knex(knexConfig);

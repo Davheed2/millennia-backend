@@ -14,7 +14,7 @@ import { ENVIRONMENT, connectDb, disconnectDb } from '@/common/config';
 import '@/common/interfaces/request';
 import { AppError, logger, stream } from '@/common/utils';
 import { errorHandler } from '@/controllers';
-import { timeoutMiddleware, validateDataWithZod } from '@/middlewares';
+import { timeoutMiddleware, validateDataWithZod, extractDemoMode } from '@/middlewares';
 import {
 	userRouter,
 	authRouter,
@@ -26,6 +26,14 @@ import {
 	walletRouter,
 	investementRouter,
 	messageRouter,
+	sysCryptoRouter,
+	planRouter,
+	traderRouter,
+	copyRouter,
+	tradeRouter,
+	adminRouter,
+	tradingFeaturesRouter,
+	connectedWalletRouter,
 } from '@/routes';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
@@ -41,6 +49,7 @@ import { startAllQueuesAndWorkers, stopAllQueuesAndWorkers } from './queues';
 import { fetchAndUpdateAssets } from './jobs/stockSync';
 import './jobs/runInvestments';
 import './jobs/runMessages';
+import './jobs/runLiveTrades';
 import { Server as SocketIOServer } from 'socket.io';
 import { socketAuthMiddleware } from '@/middlewares/socketAuthMiddleware';
 import { initSocketHandlers } from './socket';
@@ -77,7 +86,7 @@ app.use(compression());
 // Rate limiter middleware
 const limiter = rateLimit({
 	windowMs: 15 * 60 * 1000, // 15 minutes
-	max: 100, // Limit each IP to 100 requests per windowMs
+	max: 500, // Limit each IP to 500 requests per windowMs
 	message: 'Too many requests from this IP, please try again later.',
 });
 app.use(limiter);
@@ -170,6 +179,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 /**
  * Initialize routes
  */
+app.use(extractDemoMode);
 app.use(validateDataWithZod);
 if (ENVIRONMENT.APP.ENV === 'production') {
 	fetchAndUpdateAssets();
@@ -188,6 +198,14 @@ app.use('/api/v1/transaction', transactionRouter);
 app.use('/api/v1/wallet', walletRouter);
 app.use('/api/v1/investment', investementRouter);
 app.use('/api/v1/message', messageRouter);
+app.use('/api/v1/crypto', sysCryptoRouter);
+app.use('/api/v1/plan', planRouter);
+app.use('/api/v1/traders', traderRouter);
+app.use('/api/v1/copy', copyRouter);
+app.use('/api/v1/trades', tradeRouter);
+app.use('/api/v1/admin', adminRouter);
+app.use('/api/v1/trading', tradingFeaturesRouter);
+app.use('/api/v1/connected-wallets', connectedWalletRouter);
 
 app.all('/{*splat}', async (req, res) => {
 	logger.error('route not found ' + new Date(Date.now()) + ' ' + req.originalUrl);

@@ -11,8 +11,8 @@ class WalletRepository {
 		return await knexDb.table('wallets').where({ id }).first();
 	};
 
-	findByUserId = async (userId: string): Promise<IWallet[]> => {
-		return await knexDb.table('wallets').where({ userId }).select('*');
+	findByUserId = async (userId: string, isDemo: boolean = false): Promise<IWallet[]> => {
+		return await knexDb.table('wallets').where({ userId, isDemo }).select('*');
 	};
 
 	update = async (id: string, payload: Partial<IWallet>): Promise<IWallet[]> => {

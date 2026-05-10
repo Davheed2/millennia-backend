@@ -7,8 +7,13 @@ class InvestmentRepository {
 		return await knexDb.table('investments').insert(payload).returning('*');
 	};
 
+	findOneById = async (id: string, isDemo: boolean = false) => {
+		return await knexDb.table('investments').where({ id, isDeleted: false, isDemo }).first();
+	};
+
 	findById = async (
-		id: string
+		id: string,
+		isDemo: boolean = false
 	): Promise<
 		{
 			id: string;
@@ -24,6 +29,8 @@ class InvestmentRepository {
 			isRetirement: boolean;
 			isSwitchedOff: boolean;
 			isDeleted: boolean;
+			duration_days: number | null;
+			matures_at: Date | null;
 			created_at: Date;
 			shares: number;
 			change_percentage: number | null;
@@ -34,7 +41,7 @@ class InvestmentRepository {
 		// Step 1: Get base investment
 		const baseInvestment = await knexDb
 			.table('investments')
-			.where({ 'investments.id': id, 'investments.isDeleted': false })
+			.where({ 'investments.id': id, 'investments.isDeleted': false, 'investments.isDemo': isDemo })
 			.first();
 
 		if (!baseInvestment) return [];
@@ -47,6 +54,7 @@ class InvestmentRepository {
 				'investments.symbol': baseInvestment.symbol,
 				'investments.type': baseInvestment.type,
 				'investments.isDeleted': false,
+				'investments.isDemo': isDemo,
 			})
 			.select(
 				'investments.symbol',
@@ -64,6 +72,8 @@ class InvestmentRepository {
 				knexDb.raw('BOOL_OR("investments"."isRetirement") as isRetirement'),
 				knexDb.raw('BOOL_OR("investments"."isSwitchedOff") as isSwitchedOff'),
 				knexDb.raw('MIN("investments"."created_at") as created_at'),
+				knexDb.raw('MIN("investments"."duration_days") as duration_days'),
+				knexDb.raw('MIN("investments"."matures_at") as matures_at'),
 				'asset_metrics.change_percentage',
 				'asset_metrics.price',
 				'asset_metrics.performance_ytd'
@@ -82,7 +92,8 @@ class InvestmentRepository {
 	};
 
 	findByUserId = async (
-		userId: string
+		userId: string,
+		isDemo: boolean = false
 	): Promise<
 		{
 			id: string;
@@ -98,6 +109,8 @@ class InvestmentRepository {
 			isRetirement: boolean;
 			isSwitchedOff: boolean;
 			isDeleted: boolean;
+			duration_days: number | null;
+			matures_at: Date | null;
 			created_at: Date;
 			shares: number;
 			change_percentage: number | null;
@@ -107,7 +120,7 @@ class InvestmentRepository {
 	> => {
 		const investments = await knexDb
 			.table('investments')
-			.where({ userId, isDeleted: false })
+			.where({ 'investments.userId': userId, 'investments.isDeleted': false, 'investments.isDemo': isDemo })
 			.select(
 				'investments.symbol',
 				'investments.type',
@@ -124,6 +137,8 @@ class InvestmentRepository {
 				knexDb.raw('BOOL_OR("investments"."isRetirement") as isRetirement'),
 				knexDb.raw('BOOL_OR("investments"."isSwitchedOff") as isSwitchedOff'),
 				knexDb.raw('MIN("investments"."created_at") as created_at'),
+				knexDb.raw('MIN("investments"."duration_days") as duration_days'),
+				knexDb.raw('MIN("investments"."matures_at") as matures_at'),
 				'asset_metrics.change_percentage',
 				'asset_metrics.price',
 				'asset_metrics.performance_ytd'

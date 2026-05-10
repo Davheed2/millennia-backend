@@ -19,6 +19,7 @@ import {
 	FailedWithdrawalData,
 	NewMessageData,
 	AdminNewMessageData,
+	AdminNewDepositData,
 } from '../interfaces';
 import type { Response, Request } from 'express';
 import { promisify } from 'util';
@@ -549,6 +550,26 @@ const sendAdminNewMessageEmail = async (email: string, name: string, lastName: s
 	});
 };
 
+const sendAdminNewDepositEmail = async (
+	email: string,
+	userName: string,
+	amount: number,
+	reference: string
+): Promise<void> => {
+	const emailData: AdminNewDepositData = {
+		to: email,
+		priority: 'high',
+		userName,
+		amount,
+		reference,
+	};
+
+	addEmailToQueue({
+		type: 'adminNewDeposit',
+		data: emailData,
+	});
+};
+
 export {
 	dateFromString,
 	generateRandom6DigitKey,
@@ -585,4 +606,5 @@ export {
 	sendFailedWithdrawalEmail,
 	sendNewMessageEmail,
 	sendAdminNewMessageEmail,
+	sendAdminNewDepositEmail,
 };

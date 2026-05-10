@@ -5,6 +5,7 @@ export interface IWallet {
     portfolioBalance: number;
     isSuspended: boolean;
     isDeleted: boolean;
+    isDemo?: boolean;
 	created_at?: Date;
 	updated_at?: Date;
 }
